@@ -1,163 +1,405 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Settings{% endblock %}
+{% block title %}Telemetry Alert Routing &amp; Account Security Settings{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'user_settings/css/settings.css' %}">
+<style>
+    .af-settings-hero {
+        position: relative;
+        padding: 44px 0 32px;
+        border-bottom: 1px solid var(--border-hairline);
+        overflow: hidden;
+    }
+
+    .af-settings-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: radial-gradient(ellipse 80% 75% at 50% 35%, #000 50%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 35%, #000 50%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .af-settings-layout {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 28px;
+        padding: 36px 0 24px;
+    }
+
+    .af-settings-sidebar {
+        grid-column: span 4;
+    }
+
+    .af-settings-main {
+        grid-column: span 8;
+    }
+
+    .af-surface-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-hairline);
+        border-radius: 20px;
+        box-shadow: var(--shadow-md);
+        padding: 28px;
+    }
+
+    /* Segmented Command Tab Bar */
+    .af-tab-bar {
+        display: inline-flex;
+        align-items: center;
+        background: var(--bg-subtle);
+        border: 1px solid var(--border-hairline);
+        padding: 5px;
+        border-radius: 12px;
+        gap: 6px;
+        margin-bottom: 24px;
+    }
+
+    .af-tab-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 16px;
+        border-radius: 9px;
+        border: none;
+        background: transparent;
+        color: var(--text-secondary);
+        font-family: var(--font-sans);
+        font-size: 13.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.16s ease;
+    }
+
+    .af-tab-btn.active {
+        background: var(--bg-surface);
+        color: var(--brand-ocean);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .af-pref-item {
+        background: var(--bg-canvas);
+        border: 1px solid var(--border-hairline);
+        border-radius: 14px;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        transition: all 0.16s ease;
+    }
+
+    .af-pref-item:hover {
+        border-color: var(--brand-ocean);
+        background: #F8FAFC;
+    }
+
+    .af-section-divider {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--brand-ocean);
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-hairline);
+        margin: 0 0 16px 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    @media (max-width: 960px) {
+        .af-settings-sidebar,
+        .af-settings-main {
+            grid-column: span 12;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
-
-    <!-- Title and Icon -->
-    <div class="flex items-center gap-3 mb-8">
-        <div class="h-12 w-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center p-2.5 shadow-sm">
-            <img src="{% static 'user_settings/images/gear-icon.svg' %}" alt="Settings" class="h-7 w-7">
-        </div>
-        <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-aqua-navy">Account &amp; System Settings</h1>
-            <p class="text-slate-500 text-sm mt-0.5">Customize station notifications, dashboard preferences, and manage account security.</p>
-        </div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="flex border-b border-slate-200 mb-6 gap-2">
-        <button type="button" class="settings-tab-btn active px-4 py-2.5 rounded-lg text-sm font-semibold transition" data-tab="tab-preferences">
-            Station &amp; Alerts Preferences
-        </button>
-        <button type="button" class="settings-tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-tab="tab-security">
-            Security &amp; Password
-        </button>
-    </div>
-
-    <!-- Tab 1: Preferences & Notifications -->
-    <div id="tab-preferences" class="settings-tab-content">
-        <div class="settings-panel p-6 sm:p-8 border border-slate-100">
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="update_preferences">
-
-                <div class="space-y-6">
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal pb-2 border-b border-slate-100">
-                        Campus Dispenser Notification Triggers
-                    </h2>
-
-                    <!-- Row 1: Station Refill Alerts -->
-                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
-                        <div>
-                            <span class="block text-sm font-bold text-aqua-navy">Refill &amp; Maintenance Notices</span>
-                            <span class="block text-xs text-slate-500 mt-0.5">Receive immediate notifications when stations you reported are replenished or inspected.</span>
-                        </div>
-                        <div>
-                            {{ preferences_form.email_station_alerts }}
-                        </div>
-                    </div>
-
-                    <!-- Row 2: Low Water Warnings -->
-                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
-                        <div>
-                            <span class="block text-sm font-bold text-aqua-navy">Low Supply Department Warnings</span>
-                            <span class="block text-xs text-slate-500 mt-0.5">Get alerted when water dispensers near your building/college drop below 15% capacity.</span>
-                        </div>
-                        <div>
-                            {{ preferences_form.low_water_notifications }}
-                        </div>
-                    </div>
-
-                    <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal pt-4 pb-2 border-b border-slate-100">
-                        Dashboard &amp; Display Experience
-                    </h2>
-
-                    <!-- Row 3: Auto Refresh -->
-                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
-                        <div>
-                            <span class="block text-sm font-bold text-aqua-navy">Live Status Auto-Refresh</span>
-                            <span class="block text-xs text-slate-500 mt-0.5">Automatically poll and refresh dispenser telemetry data every 60 seconds.</span>
-                        </div>
-                        <div>
-                            {{ preferences_form.auto_refresh_dashboard }}
-                        </div>
-                    </div>
-
-                    <!-- Row 4: Daily Hydration Reminder -->
-                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
-                        <div>
-                            <span class="block text-sm font-bold text-aqua-navy">Daily Hydration Prompts</span>
-                            <span class="block text-xs text-slate-500 mt-0.5">Show helpful campus water intake reminder cards on your dashboard.</span>
-                        </div>
-                        <div>
-                            {{ preferences_form.show_hydration_reminder }}
-                        </div>
-                    </div>
+<!-- Top Architectural Header Banner -->
+<section class="af-settings-hero">
+    <div class="af-settings-grid-bg"></div>
+    <div class="af-container" style="position: relative; z-index: 1;">
+        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px;">
+            <div>
+                <div class="af-eyebrow">
+                    <span class="af-live-dot"></span>
+                    <span>TELEMETRY ALERT ROUTING &amp; SECURITY CONSOLE</span>
                 </div>
-
-                <div class="flex justify-end pt-6 mt-6 border-t border-slate-100">
-                    <button type="submit" class="bg-aqua-teal hover:bg-teal-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition duration-150 text-sm">
-                        Save Preferences
-                    </button>
+                <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <h1 class="font-display" style="font-size: clamp(1.85rem, 3vw, 2.5rem); font-weight: 800; margin: 0; color: var(--text-primary);">
+                        Account &amp; System Preferences
+                    </h1>
+                    <span class="af-unit-code">CIT-U CONFIG v2.0</span>
                 </div>
-            </form>
+                <p style="font-size: 15px; color: var(--text-secondary); margin: 8px 0 0 0; max-width: 640px;">
+                    Configure low-supply building notifications, real-time dashboard auto-polling intervals, and institutional account credentials.
+                </p>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="{% url 'home:home' %}" class="af-btn af-btn-outline">
+                    &larr; Live Dispenser Directory
+                </a>
+                <a href="{% url 'user_profile:profile' %}" class="af-btn af-btn-outline">
+                    My Hydration Profile &rarr;
+                </a>
+            </div>
         </div>
     </div>
+</section>
 
-    <!-- Tab 2: Security & Password -->
-    <div id="tab-security" class="settings-tab-content hidden">
-        <div class="settings-panel p-6 sm:p-8 border border-slate-100">
-            <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal pb-2 border-b border-slate-100 mb-6">
-                Change Password
-            </h2>
+<!-- Main 12-Column Settings Console -->
+<section class="af-container">
+    <div class="af-settings-layout">
 
-            <form method="post" novalidate>
-                {% csrf_token %}
-                <input type="hidden" name="action" value="change_password">
-
-                {% if password_form.non_field_errors %}
-                <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs">
-                    {% for err in password_form.non_field_errors %}
-                    <p>{{ err }}</p>
-                    {% endfor %}
-                </div>
-                {% endif %}
-
-                <div class="space-y-4 max-w-lg">
+        <!-- Left Column (4 Cols): System Status & Quick Summary -->
+        <aside class="af-settings-sidebar">
+            <div class="af-surface-card">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 18px;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: #E0F2FE; border: 1px solid #BAE6FD; display: flex; align-items: center; justify-content: center;">
+                        <img src="{% static 'user_settings/images/gear-icon.svg' %}" alt="Settings" style="width: 24px; height: 24px;">
+                    </div>
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Current Password</label>
-                        {{ password_form.old_password }}
-                        {% if password_form.old_password.errors %}
-                        <p class="text-xs text-red-600 mt-1">{{ password_form.old_password.errors.0 }}</p>
+                        <h2 class="font-display" style="font-size: 17px; font-weight: 800; margin: 0;">Telemetry Node Profile</h2>
+                        <span class="font-mono-num" style="font-size: 12px; color: var(--text-secondary);">User: @{{ request.user.username }}</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 16px; border-top: 1px solid var(--border-hairline);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                        <span style="color: var(--text-secondary);">Station Email Alerts</span>
+                        {% if user_settings.email_station_alerts %}
+                            <span class="af-status-badge af-status-opt">Enabled</span>
+                        {% else %}
+                            <span class="af-zone-pill">Muted</span>
                         {% endif %}
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">New Password</label>
-                        {{ password_form.new_password1 }}
-                        {% if password_form.new_password1.errors %}
-                        <p class="text-xs text-red-600 mt-1">{{ password_form.new_password1.errors.0 }}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                        <span style="color: var(--text-secondary);">Low Water Warnings (&lt;15%)</span>
+                        {% if user_settings.low_water_notifications %}
+                            <span class="af-status-badge af-status-opt">Active</span>
+                        {% else %}
+                            <span class="af-zone-pill">Muted</span>
                         {% endif %}
                     </div>
-
-                    <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Confirm New Password</label>
-                        {{ password_form.new_password2 }}
-                        {% if password_form.new_password2.errors %}
-                        <p class="text-xs text-red-600 mt-1">{{ password_form.new_password2.errors.0 }}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                        <span style="color: var(--text-secondary);">60s Auto-Refresh Polling</span>
+                        {% if user_settings.auto_refresh_dashboard %}
+                            <span class="af-status-badge af-status-opt">Live Sync</span>
+                        {% else %}
+                            <span class="af-zone-pill">Manual</span>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+                        <span style="color: var(--text-secondary);">Hydration Goal Prompts</span>
+                        {% if user_settings.show_hydration_reminder %}
+                            <span class="af-status-badge af-status-opt">Visible</span>
+                        {% else %}
+                            <span class="af-zone-pill">Hidden</span>
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="flex justify-start pt-6 mt-6 border-t border-slate-100">
-                    <button type="submit" class="bg-aqua-navy hover:bg-aqua-navy-light text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition duration-150 text-sm">
-                        Update Password
-                    </button>
+                <div style="margin-top: 22px; background: var(--bg-obsidian); border-radius: 14px; padding: 16px; color: #F8FAFC;">
+                    <span class="font-mono-num" style="font-size: 10.5px; color: var(--brand-cyan); font-weight: 700; display: block; margin-bottom: 4px;">
+                        SECURITY &amp; SESSION STATUS
+                    </span>
+                    <p style="font-size: 12.5px; color: #94A3B8; margin: 0;">
+                        Authenticated via Django CSRF-Protected Session Cookie. Password updates keep your current session active.
+                    </p>
                 </div>
-            </form>
+            </div>
+        </aside>
+
+        <!-- Right Column (8 Cols): Tabbed Preferences & Security Console -->
+        <div class="af-settings-main">
+
+            <!-- Segmented Pill Tab Bar -->
+            <div class="af-tab-bar" role="tablist">
+                <button type="button" class="settings-tab-btn af-tab-btn active" data-tab="tab-preferences">
+                    <span>🔔 Station &amp; Telemetry Preferences</span>
+                </button>
+                <button type="button" class="settings-tab-btn af-tab-btn" data-tab="tab-security">
+                    <span>🔐 Security &amp; Password</span>
+                </button>
+            </div>
+
+            <!-- Tab 1: Station & Alerts Preferences -->
+            <div id="tab-preferences" class="settings-tab-content">
+                <div class="af-surface-card">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_preferences">
+
+                        <div class="af-section-divider">
+                            <span>01 // Campus Dispenser Notification Triggers</span>
+                            <span class="af-unit-code">CIT-U DISPATCH</span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 28px;">
+                            <!-- Row 1: Station Refill Alerts -->
+                            <div class="af-pref-item">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <strong style="font-size: 14.5px; color: var(--text-primary);">Refill &amp; Maintenance Dispatch Notices</strong>
+                                        <span class="af-unit-code">TICKET SYNC</span>
+                                    </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary); display: block;">
+                                        Receive immediate confirmation when CIT-U stations you reported are replenished or sanitized by janitorial staff.
+                                    </span>
+                                </div>
+                                <div>
+                                    {{ preferences_form.email_station_alerts }}
+                                </div>
+                            </div>
+
+                            <!-- Row 2: Low Water Warnings -->
+                            <div class="af-pref-item">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <strong style="font-size: 14.5px; color: var(--text-primary);">Low Supply Building Warnings (&lt;15%)</strong>
+                                        <span class="af-status-badge af-status-low">THRESHOLD</span>
+                                    </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary); display: block;">
+                                        Get alerted when water dispensers inside your primary academic building drop below 15% tank capacity.
+                                    </span>
+                                </div>
+                                <div>
+                                    {{ preferences_form.low_water_notifications }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="af-section-divider">
+                            <span>02 // Telemetry Dashboard &amp; Display Experience</span>
+                            <span class="af-unit-code">UI STREAM</span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; gap: 14px; margin-bottom: 26px;">
+                            <!-- Row 3: Auto Refresh -->
+                            <div class="af-pref-item">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <strong style="font-size: 14.5px; color: var(--text-primary);">Live Telemetry Auto-Refresh (60s Interval)</strong>
+                                        <span class="af-sanitized-tag">60S POLLING</span>
+                                    </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary); display: block;">
+                                        Automatically synchronize dispenser water levels and compressor temperatures every 60 seconds.
+                                    </span>
+                                </div>
+                                <div>
+                                    {{ preferences_form.auto_refresh_dashboard }}
+                                </div>
+                            </div>
+
+                            <!-- Row 4: Daily Hydration Reminder -->
+                            <div class="af-pref-item">
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                        <strong style="font-size: 14.5px; color: var(--text-primary);">Daily Hydration Goal Prompts</strong>
+                                        <span class="af-unit-code">WELLNESS</span>
+                                    </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary); display: block;">
+                                        Display personal water intake progress badges and refill reminders across the portal header.
+                                    </span>
+                                </div>
+                                <div>
+                                    {{ preferences_form.show_hydration_reminder }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; padding-top: 18px; border-top: 1px solid var(--border-hairline);">
+                            <button type="submit" class="af-btn af-btn-primary">
+                                Save Telemetry Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tab 2: Security & Password -->
+            <div id="tab-security" class="settings-tab-content hidden">
+                <div class="af-surface-card">
+                    <div class="af-section-divider">
+                        <span>01 // Institutional Account Password Rotation</span>
+                        <span class="af-unit-code">AUTH-SHA256</span>
+                    </div>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="change_password">
+
+                        {% if password_form.non_field_errors %}
+                        <div style="margin-bottom: 18px; padding: 14px; background: var(--status-crit-bg); border: 1px solid var(--status-crit-border); color: var(--status-crit-text); border-radius: 12px; font-size: 13px; font-weight: 600;">
+                            {% for err in password_form.non_field_errors %}
+                            <p style="margin: 0;">{{ err }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div style="display: flex; flex-direction: column; gap: 18px; max-width: 540px; margin-bottom: 26px;">
+                            <div>
+                                <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+                                    Current Account Password
+                                </label>
+                                {{ password_form.old_password }}
+                                {% if password_form.old_password.errors %}
+                                <p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ password_form.old_password.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+                                    New Password
+                                </label>
+                                {{ password_form.new_password1 }}
+                                {% if password_form.new_password1.errors %}
+                                <p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ password_form.new_password1.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
+                                    Confirm New Password
+                                </label>
+                                {{ password_form.new_password2 }}
+                                {% if password_form.new_password2.errors %}
+                                <p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ password_form.new_password2.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-start; padding-top: 18px; border-top: 1px solid var(--border-hairline);">
+                            <button type="submit" class="af-btn af-btn-primary">
+                                Update Account Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
         </div>
     </div>
-
-</div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'user_settings/js/settings.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // If password form returned validation errors, automatically switch to the security tab
+        {% if password_form.errors %}
+        const secBtn = document.querySelector('[data-tab="tab-security"]');
+        if (secBtn) secBtn.click();
+        {% endif %}
+    });
+</script>
 {% endblock %}

@@ -9,16 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const targetId = this.dataset.tab;
 
                 tabBtns.forEach(b => {
-                    b.classList.remove('active', 'bg-aqua-teal', 'text-white');
-                    b.classList.add('text-slate-600', 'hover:bg-slate-100');
+                    b.classList.remove('active');
                 });
 
                 tabContents.forEach(tc => {
                     tc.classList.add('hidden');
                 });
 
-                this.classList.add('active', 'bg-aqua-teal', 'text-white');
-                this.classList.remove('text-slate-600', 'hover:bg-slate-100');
+                this.classList.add('active');
 
                 const targetEl = document.getElementById(targetId);
                 if (targetEl) {

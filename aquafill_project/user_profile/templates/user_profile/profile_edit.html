@@ -1,101 +1,185 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Edit Profile{% endblock %}
+{% block title %}Edit Institutional Profile &amp; Hydration Goal{% endblock %}
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'user_profile/css/profile.css' %}">
+<style>
+    .af-edit-hero {
+        position: relative;
+        padding: 40px 0 28px;
+        border-bottom: 1px solid var(--border-hairline);
+        overflow: hidden;
+    }
+
+    .af-edit-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: radial-gradient(ellipse 80% 75% at 50% 35%, #000 50%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 35%, #000 50%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .af-edit-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-hairline);
+        border-radius: 20px;
+        box-shadow: var(--shadow-lg);
+        padding: 32px;
+        max-width: 860px;
+        margin: 36px auto 24px;
+    }
+
+    .af-form-section-title {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--brand-ocean);
+        padding-bottom: 10px;
+        margin: 0 0 18px 0;
+        border-bottom: 1px solid var(--border-hairline);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .af-field-label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    .af-grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-bottom: 18px;
+    }
+
+    @media (max-width: 640px) {
+        .af-grid-2 {
+            grid-template-columns: 1fr;
+        }
+        .af-edit-card {
+            padding: 22px;
+        }
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <h1 class="text-2xl font-extrabold text-aqua-navy">Edit Campus Profile</h1>
-            <p class="text-slate-500 text-sm mt-1">Keep your campus contact information and hydration goals up to date.</p>
+<section class="af-edit-hero">
+    <div class="af-edit-grid-bg"></div>
+    <div class="af-container" style="position: relative; z-index: 1; max-width: 908px;">
+        <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px;">
+            <div>
+                <div class="af-eyebrow">
+                    <span class="af-live-dot"></span>
+                    <span>CIT-U DIRECTORY &amp; HYDRATION CONFIGURATION</span>
+                </div>
+                <h1 class="font-display" style="font-size: clamp(1.75rem, 2.8vw, 2.25rem); font-weight: 800; margin: 0; color: var(--text-primary);">
+                    Edit Campus Profile &amp; Hydration Goal
+                </h1>
+                <p style="font-size: 14.5px; color: var(--text-secondary); margin: 6px 0 0 0;">
+                    Update your CIT-U institutional details, contact telemetry, and daily water consumption target.
+                </p>
+            </div>
+            <a href="{% url 'user_profile:profile' %}" class="af-btn af-btn-outline">
+                &larr; Back to Profile
+            </a>
         </div>
-        <a href="{% url 'user_profile:profile' %}"
-           class="text-sm font-semibold text-slate-500 hover:text-aqua-teal transition">
-            &larr; Cancel &amp; Back
-        </a>
     </div>
+</section>
 
-    <div class="profile-card p-6 sm:p-8 border border-slate-100">
+<div class="af-container">
+    <div class="af-edit-card">
         <form method="post" novalidate>
             {% csrf_token %}
 
-            <!-- Section 1: Basic Info -->
-            <div class="mb-8">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal mb-4 pb-2 border-b border-slate-100">
-                    Account Identification
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <!-- Section 1: Account Identification -->
+            <div style="margin-bottom: 30px;">
+                <div class="af-form-section-title">
+                    <span>01 // Account Identification</span>
+                    <span class="af-unit-code">@{{ request.user.username }}</span>
+                </div>
+
+                <div class="af-grid-2">
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">First Name</label>
+                        <label class="af-field-label">First Name</label>
                         {{ user_form.first_name }}
-                        {% if user_form.first_name.errors %}<p class="text-xs text-red-600 mt-1">{{ user_form.first_name.errors.0 }}</p>{% endif %}
+                        {% if user_form.first_name.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ user_form.first_name.errors.0 }}</p>{% endif %}
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Last Name</label>
+                        <label class="af-field-label">Last Name</label>
                         {{ user_form.last_name }}
-                        {% if user_form.last_name.errors %}<p class="text-xs text-red-600 mt-1">{{ user_form.last_name.errors.0 }}</p>{% endif %}
+                        {% if user_form.last_name.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ user_form.last_name.errors.0 }}</p>{% endif %}
                     </div>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-aqua-navy mb-1">Email Address</label>
+                    <label class="af-field-label">Institutional Email Address</label>
                     {{ user_form.email }}
-                    {% if user_form.email.errors %}<p class="text-xs text-red-600 mt-1">{{ user_form.email.errors.0 }}</p>{% endif %}
+                    {% if user_form.email.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ user_form.email.errors.0 }}</p>{% endif %}
                 </div>
             </div>
 
-            <!-- Section 2: Campus Details -->
-            <div class="mb-8">
-                <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal mb-4 pb-2 border-b border-slate-100">
-                    Campus &amp; Institutional Affiliation
-                </h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <!-- Section 2: Campus & Institutional Affiliation -->
+            <div style="margin-bottom: 28px;">
+                <div class="af-form-section-title">
+                    <span>02 // CIT-U Institutional Affiliation &amp; Hydration Target</span>
+                    <span class="af-sanitized-tag">Verified Telemetry</span>
+                </div>
+
+                <div class="af-grid-2">
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Department / College</label>
+                        <label class="af-field-label">Department / College</label>
                         {{ details_form.department }}
-                        {% if details_form.department.errors %}<p class="text-xs text-red-600 mt-1">{{ details_form.department.errors.0 }}</p>{% endif %}
+                        {% if details_form.department.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ details_form.department.errors.0 }}</p>{% endif %}
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Campus / Student ID</label>
+                        <label class="af-field-label">CIT-U Campus / Student ID</label>
                         {{ details_form.student_id }}
-                        {% if details_form.student_id.errors %}<p class="text-xs text-red-600 mt-1">{{ details_form.student_id.errors.0 }}</p>{% endif %}
+                        {% if details_form.student_id.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ details_form.student_id.errors.0 }}</p>{% endif %}
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+
+                <div class="af-grid-2">
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Contact Phone</label>
+                        <label class="af-field-label">Contact Phone Number</label>
                         {{ details_form.phone_number }}
-                        {% if details_form.phone_number.errors %}<p class="text-xs text-red-600 mt-1">{{ details_form.phone_number.errors.0 }}</p>{% endif %}
+                        {% if details_form.phone_number.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ details_form.phone_number.errors.0 }}</p>{% endif %}
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-aqua-navy mb-1">Daily Hydration Goal (ml)</label>
+                        <label class="af-field-label">Daily Hydration Target (ml)</label>
                         {{ details_form.daily_water_target_ml }}
-                        {% if details_form.daily_water_target_ml.errors %}<p class="text-xs text-red-600 mt-1">{{ details_form.daily_water_target_ml.errors.0 }}</p>{% endif %}
+                        {% if details_form.daily_water_target_ml.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ details_form.daily_water_target_ml.errors.0 }}</p>{% endif %}
                     </div>
                 </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-aqua-navy mb-1">Bio / Status</label>
+                    <label class="af-field-label">Campus Bio / Hydration Status Note</label>
                     {{ details_form.bio }}
-                    {% if details_form.bio.errors %}<p class="text-xs text-red-600 mt-1">{{ details_form.bio.errors.0 }}</p>{% endif %}
+                    {% if details_form.bio.errors %}<p style="font-size: 12px; color: var(--status-crit-text); margin-top: 4px;">{{ details_form.bio.errors.0 }}</p>{% endif %}
                 </div>
             </div>
 
-            <!-- Submit Button -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <a href="{% url 'user_profile:profile' %}" class="px-5 py-2.5 rounded-xl text-slate-600 hover:bg-slate-100 font-semibold text-sm transition">
+            <!-- Action Footer -->
+            <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; padding-top: 20px; border-top: 1px solid var(--border-hairline);">
+                <a href="{% url 'user_profile:profile' %}" class="af-btn af-btn-outline">
                     Cancel
                 </a>
-                <button type="submit" class="bg-aqua-teal hover:bg-teal-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition duration-150 text-sm">
-                    Save Changes
+                <button type="submit" class="af-btn af-btn-primary">
+                    Save Profile &amp; Telemetry Target
                 </button>
             </div>
         </form>
     </div>
-
 </div>
 {% endblock %}
