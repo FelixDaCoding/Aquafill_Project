@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Campus Stations Dashboard{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Top Welcome Banner -->
+    <div class="bg-gradient-to-r from-aqua-navy via-aqua-navy-light to-aqua-teal rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden mb-8">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-cyan-200 text-xs font-semibold uppercase tracking-wider backdrop-blur border border-white/10 mb-3">
+                    <span class="h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    Live Campus Facility Telemetry
+                </div>
+                <h1 class="text-2xl sm:text-4xl font-black tracking-tight">
+                    Welcome back, {{ request.user.username }}! 👋
+                </h1>
+                <p class="text-cyan-100 text-sm sm:text-base mt-1 max-w-xl">
+                    {% if profile %}
+                        Logged in as <strong class="text-white">{{ profile.get_role_display }}</strong> &middot; {{ profile.institutional_email }}
+                    {% else %}
+                        Monitor campus water stations, check supply levels, and report empty tanks in real-time.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-3">
+                <a href="{% url 'user_profile:profile' %}"
+                   class="bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border border-white/20 backdrop-blur transition">
+                    View My Profile &rarr;
+                </a>
+                <button type="button" class="open-report-btn bg-cyan-400 hover:bg-cyan-300 text-slate-900 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-lg transition">
+                    + Report Station Issue
+                </button>
+            </div>
+        </div>
+
+        <!-- Decorative background glow -->
+        <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none"></div>
+    </div>
+
+    <!-- Live Telemetry KPI Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        {% for stat in stats %}
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ stat.label }}</span>
+                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full
+                    {% if stat.badge_color == 'teal' %} bg-teal-50 text-teal-700 border border-teal-200
+                    {% elif stat.badge_color == 'amber' %} bg-amber-50 text-amber-700 border border-amber-200
+                    {% elif stat.badge_color == 'rose' %} bg-rose-50 text-rose-700 border border-rose-200
+                    {% else %} bg-cyan-50 text-cyan-700 border border-cyan-200 {% endif %}">
+                    {{ stat.badge }}
+                </span>
+            </div>
+            <div class="text-3xl font-black text-aqua-navy">{{ stat.value }}</div>
+            <div class="text-xs text-slate-500 mt-1">{{ stat.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Station Filter & Search Toolbar -->
+    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-2">
+            <img src="{% static 'home/images/station-icon.svg' %}" alt="Icon" class="h-6 w-6">
+            <h2 class="text-xl font-bold text-aqua-navy">Campus Water Dispensers</h2>
+        </div>
+
+        <div class="flex flex-col sm:flex-row w-full md:w-auto items-stretch sm:items-center gap-3">
+            <input type="text" id="station-search" placeholder="Search building or station name..."
+                   class="px-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 w-full sm:w-64 bg-white">
+
+            <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 text-xs font-bold">
+                <button type="button" class="station-filter-btn active px-3 py-1.5 rounded-lg transition" data-filter="all">All</button>
+                <button type="button" class="station-filter-btn px-3 py-1.5 rounded-lg transition text-slate-600" data-filter="online">Online</button>
+                <button type="button" class="station-filter-btn px-3 py-1.5 rounded-lg transition text-slate-600" data-filter="low_water">Low Water</button>
+                <button type="button" class="station-filter-btn px-3 py-1.5 rounded-lg transition text-slate-600" data-filter="maintenance">Maintenance</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Water Stations Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for station in stations %}
+        <div class="station-card bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col justify-between"
+             data-name="{{ station.name }}" data-building="{{ station.building }}" data-status="{{ station.status }}">
+
+            <div>
+                <!-- Header: Name & Status Pill -->
+                <div class="flex items-start justify-between gap-2 mb-3">
+                    <div>
+                        <h3 class="font-bold text-aqua-navy text-lg leading-snug">{{ station.name }}</h3>
+                        <p class="text-xs font-medium text-slate-500">{{ station.building }} &middot; {{ station.floor }}</p>
+                    </div>
+                    <div>
+                        {% if station.status == 'ONLINE' %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
+                                <span class="h-2 w-2 rounded-full bg-teal-500 pulse-online"></span>
+                                Online
+                            </span>
+                        {% elif station.status == 'LOW_WATER' %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                                Low Supply
+                            </span>
+                        {% elif station.status == 'MAINTENANCE' %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                <span class="h-2 w-2 rounded-full bg-rose-500"></span>
+                                Maintenance
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                Offline
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Water Tank Level Progress Bar -->
+                <div class="my-4">
+                    <div class="flex justify-between text-xs font-semibold mb-1">
+                        <span class="text-slate-500">Supply Level</span>
+                        <span class="{% if station.current_level_percentage > 40 %}text-teal-700{% elif station.current_level_percentage > 15 %}text-amber-700{% else %}text-rose-700{% endif %} font-bold">
+                            {{ station.current_level_percentage }}% ({{ station.capacity_liters }}L tank)
+                        </span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                        <div class="h-3 rounded-full water-level-bar
+                            {% if station.current_level_percentage > 40 %} bg-gradient-to-r from-teal-500 to-cyan-400
+                            {% elif station.current_level_percentage > 15 %} bg-gradient-to-r from-amber-500 to-amber-400
+                            {% else %} bg-gradient-to-r from-rose-500 to-rose-400 {% endif %}"
+                             style="width: {{ station.current_level_percentage }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Telemetry Row -->
+                <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl mb-4">
+                    <div>
+                        <span class="block text-[10px] uppercase font-bold text-slate-400">Chilled Temp</span>
+                        <span class="font-semibold text-slate-700">{{ station.temperature_celsius }} °C ❄️</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] uppercase font-bold text-slate-400">Dispensed</span>
+                        <span class="font-semibold text-slate-700">{{ station.total_dispensed_liters|floatformat:0 }} Liters</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
+                <button type="button" class="open-report-btn text-xs font-bold text-rose-600 hover:text-rose-800 transition py-1"
+                        data-station-id="{{ station.id }}">
+                    ⚠️ Report Refill / Issue
+                </button>
+
+                {% if profile.role == 'FACILITY_STAFF' or request.user.is_superuser %}
+                <a href="{% url 'home:refill' station.id %}"
+                   class="text-xs bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 font-bold px-3 py-1.5 rounded-lg transition">
+                    Mark 100% Full 💧
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full bg-white rounded-2xl border border-slate-100 p-8 text-center">
+            <div class="h-16 w-16 mx-auto rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-3xl mb-3">💧</div>
+            <h3 class="font-bold text-aqua-navy text-lg">No Stations Loaded Yet</h3>
+            <p class="text-sm text-slate-500 max-w-md mx-auto mt-1 mb-4">
+                Run the database seed command to populate realistic campus dispensers for testing!
+            </p>
+            <code class="bg-slate-100 px-3 py-1 rounded font-mono text-xs text-teal-800">python manage.py seed_aquafill</code>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+<!-- Modal: Report Empty Station / Issue -->
+<div id="report-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-aqua-navy">Report Water Station</h3>
+            <button type="button" id="close-report-modal" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-4">Submit a maintenance ticket. Facility staff will be dispatched to replenish or inspect the unit.</p>
+
+        <form method="post" action="{% url 'home:report' %}">
+            {% csrf_token %}
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-aqua-navy mb-1">Target Station</label>
+                    {{ report_form.station }}
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-aqua-navy mb-1">Issue Encountered</label>
+                    {{ report_form.issue_type }}
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-aqua-navy mb-1">Notes / Description</label>
+                    {{ report_form.notes }}
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 mt-6">
+                <button type="button" onclick="document.getElementById('report-modal').classList.add('hidden')"
+                        class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">
+                    Cancel
+                </button>
+                <button type="submit" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow-md transition">
+                    Submit Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'home/js/home.js' %}"></script>
+{% endblock %}

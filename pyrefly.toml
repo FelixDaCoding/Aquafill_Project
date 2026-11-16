@@ -1,0 +1,21 @@
+# Pyrefly Configuration for AquaFill (root level)
+python-interpreter-path = "C:/Python313/python.exe"
+
+search-path = [
+    "aquafill_project",
+    "aquafill_project/authentication",
+    "aquafill_project/home",
+    "aquafill_project/user_profile",
+    "aquafill_project/user_settings",
+    "aquafill_project/aquafill_project"
+]
+
+site-package-path = [
+    "C:/Users/L27X15W42/AppData/Roaming/Python/Python313/site-packages",
+    "C:/Python313/Lib/site-packages"
+]
+
+[errors]
+missing-import = "ignore"
+import-cycle = "ignore"
+unresolved-import = "ignore"

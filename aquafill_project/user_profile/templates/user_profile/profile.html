@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'user_profile/css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Header / Navigation back -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-aqua-navy flex items-center gap-3">
+                <span>Campus Profile</span>
+                <span class="text-xs bg-teal-100 text-teal-800 px-3 py-1 rounded-full uppercase tracking-wider font-bold">
+                    {{ campus_profile.get_role_display|default:"Student" }}
+                </span>
+            </h1>
+            <p class="text-slate-500 text-sm mt-1">Manage your institutional identity, department affiliation, and personal hydration goals.</p>
+        </div>
+        <a href="{% url 'user_profile:edit' %}"
+           class="inline-flex items-center justify-center gap-2 bg-aqua-teal hover:bg-teal-700 text-white font-semibold px-5 py-2.5 rounded-xl shadow-md transition duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            Edit Profile
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Left Column: User Identity Card -->
+        <div class="profile-card p-6 border border-slate-100 flex flex-col items-center text-center">
+            <div class="relative mb-4">
+                <img src="{% static 'user_profile/images/avatar-default.svg' %}" alt="Avatar" class="h-28 w-28 rounded-full shadow-md">
+            </div>
+
+            <h2 class="text-xl font-bold text-aqua-navy">
+                {% if request.user.first_name %}{{ request.user.first_name }} {{ request.user.last_name }}{% else %}{{ request.user.username }}{% endif %}
+            </h2>
+            <p class="text-sm text-slate-500 font-mono">@{{ request.user.username }}</p>
+
+            <div class="w-full mt-6 pt-6 border-t border-slate-100 text-left space-y-3">
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Official Email</span>
+                    <span class="text-sm font-medium text-slate-700 break-all">{{ campus_profile.institutional_email|default:request.user.email|default:"Not set" }}</span>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Department</span>
+                    <span class="text-sm font-medium text-slate-700">{{ profile_details.department|default:"College of Computer Studies" }}</span>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Campus ID</span>
+                    <span class="text-sm font-medium text-slate-700">{{ profile_details.student_id|default:"Pending Verification" }}</span>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Contact Number</span>
+                    <span class="text-sm font-medium text-slate-700">{{ profile_details.phone_number|default:"Not specified" }}</span>
+                </div>
+            </div>
+
+            <div class="w-full mt-6 pt-4 border-t border-slate-100 text-left">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-1">About</span>
+                <p class="text-xs text-slate-600 italic">{{ profile_details.bio }}</p>
+            </div>
+        </div>
+
+        <!-- Right Column: Hydration Tracker & Metrics -->
+        <div class="lg:col-span-2 space-y-6">
+
+            <!-- Hydration Progress Card -->
+            <div class="profile-card p-6 border border-slate-100 bg-gradient-to-br from-white via-cyan-50/30 to-teal-50/40">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-aqua-navy flex items-center gap-2">
+                            <span>Daily Hydration Goal</span>
+                            <span class="text-xl">💧</span>
+                        </h3>
+                        <p class="text-xs text-slate-500">Track your daily water intake from campus AquaFill stations.</p>
+                    </div>
+                    <span class="text-2xl font-black text-aqua-teal">{{ profile_details.hydration_percentage }}%</span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden mb-3">
+                    <div class="bg-gradient-to-r from-aqua-teal to-aqua-cyan h-4 rounded-full hydration-bar-glow transition-all duration-500"
+                         style="width: {{ profile_details.hydration_percentage }}%;"></div>
+                </div>
+
+                <div class="flex justify-between text-xs font-semibold text-slate-500 mb-6">
+                    <span>Logged Today: <strong class="text-aqua-navy">{{ profile_details.water_consumed_today_ml }} ml</strong></span>
+                    <span>Target: <strong class="text-aqua-navy">{{ profile_details.daily_water_target_ml }} ml</strong></span>
+                </div>
+
+                <!-- Quick Hydration Log Form -->
+                <form method="post" action="{% url 'user_profile:log_water' %}" class="bg-white p-4 rounded-xl border border-teal-100">
+                    {% csrf_token %}
+                    <label class="block text-xs font-bold text-aqua-navy uppercase tracking-wider mb-2">Quick Log Refill Intake</label>
+                    <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center">
+                        <button type="button" class="quick-log-btn px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold rounded-lg border border-teal-200" data-amount="250">+250 ml (Cup)</button>
+                        <button type="button" class="quick-log-btn px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold rounded-lg border border-teal-200" data-amount="500">+500 ml (Bottle)</button>
+                        <button type="button" class="quick-log-btn px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold rounded-lg border border-teal-200" data-amount="750">+750 ml (Flask)</button>
+                        <div class="flex-1 min-w-[120px]">
+                            {{ hydration_form.amount_ml }}
+                        </div>
+                        <button type="submit" class="bg-aqua-teal hover:bg-teal-700 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow">
+                            Log Intake
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Campus Activity & Station Badges -->
+            <div class="profile-card p-6 border border-slate-100">
+                <h3 class="text-base font-bold text-aqua-navy mb-3">Campus Station Achievements</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="p-4 rounded-xl bg-teal-50 border border-teal-100 text-center">
+                        <div class="text-2xl mb-1">🌿</div>
+                        <div class="text-xs font-bold text-teal-900">Eco Guardian</div>
+                        <div class="text-[11px] text-teal-700 mt-1">Saved 42 plastic bottles</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-cyan-50 border border-cyan-100 text-center">
+                        <div class="text-2xl mb-1">🏛️</div>
+                        <div class="text-xs font-bold text-cyan-900">Campus Explorer</div>
+                        <div class="text-[11px] text-cyan-700 mt-1">Refilled at 5 different stations</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-50 border border-blue-100 text-center">
+                        <div class="text-2xl mb-1">💧</div>
+                        <div class="text-xs font-bold text-blue-900">Hydration Streak</div>
+                        <div class="text-[11px] text-blue-700 mt-1">7 days goal reached</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'user_profile/js/profile.js' %}"></script>
+{% endblock %}

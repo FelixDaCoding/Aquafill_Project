@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Settings{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'user_settings/css/settings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+
+    <!-- Title and Icon -->
+    <div class="flex items-center gap-3 mb-8">
+        <div class="h-12 w-12 rounded-2xl bg-teal-50 border border-teal-200 flex items-center justify-center p-2.5 shadow-sm">
+            <img src="{% static 'user_settings/images/gear-icon.svg' %}" alt="Settings" class="h-7 w-7">
+        </div>
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-aqua-navy">Account &amp; System Settings</h1>
+            <p class="text-slate-500 text-sm mt-0.5">Customize station notifications, dashboard preferences, and manage account security.</p>
+        </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="flex border-b border-slate-200 mb-6 gap-2">
+        <button type="button" class="settings-tab-btn active px-4 py-2.5 rounded-lg text-sm font-semibold transition" data-tab="tab-preferences">
+            Station &amp; Alerts Preferences
+        </button>
+        <button type="button" class="settings-tab-btn px-4 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition" data-tab="tab-security">
+            Security &amp; Password
+        </button>
+    </div>
+
+    <!-- Tab 1: Preferences & Notifications -->
+    <div id="tab-preferences" class="settings-tab-content">
+        <div class="settings-panel p-6 sm:p-8 border border-slate-100">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_preferences">
+
+                <div class="space-y-6">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal pb-2 border-b border-slate-100">
+                        Campus Dispenser Notification Triggers
+                    </h2>
+
+                    <!-- Row 1: Station Refill Alerts -->
+                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
+                        <div>
+                            <span class="block text-sm font-bold text-aqua-navy">Refill &amp; Maintenance Notices</span>
+                            <span class="block text-xs text-slate-500 mt-0.5">Receive immediate notifications when stations you reported are replenished or inspected.</span>
+                        </div>
+                        <div>
+                            {{ preferences_form.email_station_alerts }}
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Low Water Warnings -->
+                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
+                        <div>
+                            <span class="block text-sm font-bold text-aqua-navy">Low Supply Department Warnings</span>
+                            <span class="block text-xs text-slate-500 mt-0.5">Get alerted when water dispensers near your building/college drop below 15% capacity.</span>
+                        </div>
+                        <div>
+                            {{ preferences_form.low_water_notifications }}
+                        </div>
+                    </div>
+
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal pt-4 pb-2 border-b border-slate-100">
+                        Dashboard &amp; Display Experience
+                    </h2>
+
+                    <!-- Row 3: Auto Refresh -->
+                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
+                        <div>
+                            <span class="block text-sm font-bold text-aqua-navy">Live Status Auto-Refresh</span>
+                            <span class="block text-xs text-slate-500 mt-0.5">Automatically poll and refresh dispenser telemetry data every 60 seconds.</span>
+                        </div>
+                        <div>
+                            {{ preferences_form.auto_refresh_dashboard }}
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Daily Hydration Reminder -->
+                    <div class="settings-row p-4 rounded-xl border border-slate-100 flex items-center justify-between gap-4">
+                        <div>
+                            <span class="block text-sm font-bold text-aqua-navy">Daily Hydration Prompts</span>
+                            <span class="block text-xs text-slate-500 mt-0.5">Show helpful campus water intake reminder cards on your dashboard.</span>
+                        </div>
+                        <div>
+                            {{ preferences_form.show_hydration_reminder }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-6 mt-6 border-t border-slate-100">
+                    <button type="submit" class="bg-aqua-teal hover:bg-teal-700 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition duration-150 text-sm">
+                        Save Preferences
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tab 2: Security & Password -->
+    <div id="tab-security" class="settings-tab-content hidden">
+        <div class="settings-panel p-6 sm:p-8 border border-slate-100">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-aqua-teal pb-2 border-b border-slate-100 mb-6">
+                Change Password
+            </h2>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="change_password">
+
+                {% if password_form.non_field_errors %}
+                <div class="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-xs">
+                    {% for err in password_form.non_field_errors %}
+                    <p>{{ err }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="space-y-4 max-w-lg">
+                    <div>
+                        <label class="block text-xs font-bold text-aqua-navy mb-1">Current Password</label>
+                        {{ password_form.old_password }}
+                        {% if password_form.old_password.errors %}
+                        <p class="text-xs text-red-600 mt-1">{{ password_form.old_password.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-aqua-navy mb-1">New Password</label>
+                        {{ password_form.new_password1 }}
+                        {% if password_form.new_password1.errors %}
+                        <p class="text-xs text-red-600 mt-1">{{ password_form.new_password1.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-aqua-navy mb-1">Confirm New Password</label>
+                        {{ password_form.new_password2 }}
+                        {% if password_form.new_password2.errors %}
+                        <p class="text-xs text-red-600 mt-1">{{ password_form.new_password2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="flex justify-start pt-6 mt-6 border-t border-slate-100">
+                    <button type="submit" class="bg-aqua-navy hover:bg-aqua-navy-light text-white font-semibold px-6 py-2.5 rounded-xl shadow-md transition duration-150 text-sm">
+                        Update Password
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'user_settings/js/settings.js' %}"></script>
+{% endblock %}

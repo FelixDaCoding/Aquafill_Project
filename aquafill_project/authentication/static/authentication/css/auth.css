@@ -1,0 +1,14 @@
+/* AquaFill Auth Vertical Slice Styles */
+.auth-bg {
+    background: radial-gradient(circle at 10% 20%, #0B2545 0%, #13315C 50%, #0D9488 100%);
+}
+
+.auth-card {
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 25px 50px -12px rgba(11, 37, 69, 0.35);
+}
+
+.input-focus-glow:focus {
+    box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.2);
+}

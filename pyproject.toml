@@ -1,0 +1,19 @@
+[tool.pyrefly]
+search-path = [
+    "aquafill_project",
+    "."
+]
+site-package-path = [
+    "C:/Users/L27X15W42/AppData/Roaming/Python/Python313/site-packages",
+    "C:/Python313/Lib/site-packages"
+]
+python-interpreter-path = "C:/Python313/python.exe"
+
+[tool.pyrefly.errors]
+missing-import = "ignore"
+
+[tool.pyright]
+include = ["aquafill_project"]
+extraPaths = ["aquafill_project"]
+reportMissingImports = false
+reportMissingModuleSource = false

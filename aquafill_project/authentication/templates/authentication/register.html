@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'authentication/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="flex-1 flex items-center justify-center auth-bg px-4 py-12 min-h-screen">
+    <div class="w-full max-w-md">
+
+        <!-- Brand header -->
+        <div class="text-center mb-6">
+            <div class="mx-auto h-20 w-20 rounded-3xl bg-white/10 backdrop-blur flex items-center justify-center mb-3 border border-white/20 shadow-xl p-3">
+                <img src="{% static 'authentication/images/water-drop.svg' %}" alt="AquaFill Logo" class="h-14 w-14">
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-wide">AquaFill</h1>
+            <p class="text-cyan-100 text-sm mt-1">Campus Water Dispenser &amp; Facility Management</p>
+        </div>
+
+        <!-- Card -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
+            <h2 class="text-xl font-bold text-aqua-navy mb-1">Create an account</h2>
+            <p class="text-slate-500 text-sm mb-6">Register with your official campus credentials.</p>
+
+            <form method="post" action="{% url 'authentication:register' %}" novalidate>
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="mb-4">
+                    <label for="{{ form.username.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Username
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.institutional_email.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Institutional Email
+                    </label>
+                    {{ form.institutional_email }}
+                    {% if form.institutional_email.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.institutional_email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.role.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Campus Role
+                    </label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.role.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-4">
+                    <label for="{{ form.password1.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Password
+                    </label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mb-6">
+                    <label for="{{ form.password2.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Confirm Password
+                    </label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-aqua-teal hover:bg-teal-700 text-white font-semibold py-3.5 rounded-xl
+                           transition duration-150 shadow-lg shadow-teal-900/20 text-sm">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-slate-500 mt-6">
+                Already have an account?
+                <a href="{% url 'authentication:login' %}" class="text-aqua-teal font-bold hover:underline">
+                    Log in here
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'authentication/js/auth.js' %}"></script>
+{% endblock %}
