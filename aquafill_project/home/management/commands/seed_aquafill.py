@@ -117,6 +117,15 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'Successfully seeded {len(stations_data)} Water Stations ({created_count} newly created).'))
 
+        # Ensure default 'admin' user exists and all existing accounts have Admin/Superuser access
+        admin_user, _ = User.objects.update_or_create(
+            username='admin',
+            defaults={'email': 'admin@cit.edu', 'is_staff': True, 'is_superuser': True},
+        )
+        admin_user.set_password('admin12345')
+        admin_user.save()
+        User.objects.all().update(is_staff=True, is_superuser=True)
+
         # Ensure all existing users have Profile, UserProfile, and UserSettings
         for user in User.objects.all():
             Profile.objects.get_or_create(

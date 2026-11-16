@@ -1,178 +1,107 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Create CIT-U Campus Account{% endblock %}
+{% block title %}Register{% endblock %}
 
 {% block extra_head %}
-<style>
-    .af-auth-section {
-        position: relative;
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 48px 24px;
-        overflow: hidden;
-    }
-
-    .af-auth-grid-bg {
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
-        background-size: 24px 24px;
-        mask-image: radial-gradient(ellipse 80% 75% at 50% 40%, #000 55%, transparent 100%);
-        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 40%, #000 55%, transparent 100%);
-        pointer-events: none;
-    }
-
-    .af-auth-card {
-        position: relative;
-        z-index: 1;
-        width: 100%;
-        max-width: 520px;
-        background: var(--bg-surface);
-        border: 1px solid var(--border-hairline);
-        border-radius: 22px;
-        box-shadow: var(--shadow-lg);
-        padding: 36px;
-    }
-</style>
-{% endblock %}
-
-{% block site_header %}
-<!-- Top Telemetry Ticker Strip -->
-<div class="af-ticker">
-    <div class="af-container af-ticker-inner">
-        <div class="af-ticker-message">
-            <span class="af-live-dot"></span>
-            <span class="font-mono-num" style="color: var(--brand-cyan); font-weight: 700;">CIT-U HYDRATION NETWORK:</span>
-            <span>Register with your institutional credentials to track hydration and report empty stations</span>
-        </div>
-        <div class="af-ticker-shortcuts">
-            <a href="{% url 'authentication:login' %}" class="af-ticker-tag">Sign In &rarr;</a>
-        </div>
-    </div>
-</div>
-
-<!-- Glassmorphic Header -->
-<header class="af-navbar">
-    <div class="af-container af-navbar-inner">
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <a href="{% url 'authentication:login' %}" class="af-brand">
-                <span class="af-logo-mark">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
-                        <path d="M8 14c1.5 1.5 3.5 1.5 5 0s3.5-1.5 5 0"/>
-                    </svg>
-                </span>
-                <span class="af-brand-name">AquaFill</span>
-            </a>
-            <span class="af-campus-badge">CIT-U CAMPUS</span>
-        </div>
-
-        <div class="af-nav-actions">
-            <a href="{% url 'authentication:login' %}" class="af-btn af-btn-outline">
-                Sign In
-            </a>
-            <a href="/admin/login/?next=/admin/" class="af-btn af-btn-primary">
-                Admin Portal
-            </a>
-        </div>
-    </div>
-</header>
+<link rel="stylesheet" href="{% static 'authentication/css/auth.css' %}">
 {% endblock %}
 
 {% block content %}
-<section class="af-auth-section">
-    <div class="af-auth-grid-bg"></div>
+<div class="flex-1 flex items-center justify-center auth-bg px-4 py-12 min-h-screen">
+    <div class="w-full max-w-md">
 
-    <div class="af-auth-card">
-        <div class="af-eyebrow" style="margin-bottom: 12px;">
-            <span class="af-live-dot"></span>
-            <span>NEW CIT-U ACCOUNT REGISTRATION</span>
+        <!-- Brand header -->
+        <div class="text-center mb-6">
+            <div class="mx-auto h-20 w-20 rounded-3xl bg-white/10 backdrop-blur flex items-center justify-center mb-3 border border-white/20 shadow-xl p-3">
+                <img src="{% static 'authentication/images/water-drop.svg' %}" alt="AquaFill Logo" class="h-14 w-14">
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-wide">AquaFill</h1>
+            <p class="text-cyan-100 text-sm mt-1">Campus Water Dispenser &amp; Facility Management</p>
         </div>
 
-        <h1 class="font-display" style="font-size: 24px; font-weight: 800; margin: 0 0 6px 0;">
-            Create Campus Account
-        </h1>
-        <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 0 22px 0;">
-            Register as a Student, Faculty member, or Facility Staff to access live station telemetry.
-        </p>
+        <!-- Card -->
+        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
+            <h2 class="text-xl font-bold text-aqua-navy mb-1">Create an account</h2>
+            <p class="text-slate-500 text-sm mb-6">Register with your official campus credentials.</p>
 
-        <form method="post" action="{% url 'authentication:register' %}" novalidate>
-            {% csrf_token %}
+            <form method="post" action="{% url 'authentication:register' %}" novalidate>
+                {% csrf_token %}
 
-            {% if form.non_field_errors %}
-            <div style="margin-bottom: 16px; padding: 12px 14px; border-radius: 12px; background: var(--status-crit-bg); border: 1px solid var(--status-crit-border); color: var(--status-crit-text); font-size: 13px; font-weight: 600;">
-                {% for error in form.non_field_errors %}
-                    <p style="margin: 0;">{{ error }}</p>
-                {% endfor %}
-            </div>
-            {% endif %}
-
-            <div style="margin-bottom: 14px;">
-                <label for="{{ form.username.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
-                    Username
-                </label>
-                {{ form.username }}
-                {% if form.username.errors %}
-                    <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.username.errors.0 }}</p>
+                {% if form.non_field_errors %}
+                <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </div>
                 {% endif %}
-            </div>
 
-            <div style="margin-bottom: 14px;">
-                <label for="{{ form.institutional_email.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
-                    Institutional Email (@cit.edu)
-                </label>
-                {{ form.institutional_email }}
-                {% if form.institutional_email.errors %}
-                    <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.institutional_email.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="{{ form.username.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Username
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-            <div style="margin-bottom: 14px;">
-                <label for="{{ form.role.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
-                    Campus Role
-                </label>
-                {{ form.role }}
-                {% if form.role.errors %}
-                    <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.role.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="{{ form.institutional_email.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Institutional Email
+                    </label>
+                    {{ form.institutional_email }}
+                    {% if form.institutional_email.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.institutional_email.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-            <div style="margin-bottom: 14px;">
-                <label for="{{ form.password1.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
-                    Password
-                </label>
-                {{ form.password1 }}
-                {% if form.password1.errors %}
-                    <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.password1.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="{{ form.role.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Campus Role
+                    </label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.role.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-            <div style="margin-bottom: 22px;">
-                <label for="{{ form.password2.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">
-                    Confirm Password
-                </label>
-                {{ form.password2 }}
-                {% if form.password2.errors %}
-                    <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.password2.errors.0 }}</p>
-                {% endif %}
-            </div>
+                <div class="mb-4">
+                    <label for="{{ form.password1.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Password
+                    </label>
+                    {{ form.password1 }}
+                    {% if form.password1.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.password1.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-            <button type="submit" class="af-btn af-btn-primary" style="width: 100%; min-height: 46px; font-size: 14px;">
-                Create CIT-U Account &rarr;
-            </button>
-        </form>
+                <div class="mb-6">
+                    <label for="{{ form.password2.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                        Confirm Password
+                    </label>
+                    {{ form.password2 }}
+                    {% if form.password2.errors %}
+                        <p class="mt-1 text-xs text-red-600">{{ form.password2.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-hairline); text-align: center; font-size: 12.5px; color: var(--text-secondary);">
-            Already have a campus account?
-            <a href="{% url 'authentication:login' %}" style="color: var(--brand-ocean); font-weight: 700; text-decoration: none;">
-                Sign in here
-            </a>
+                <button type="submit"
+                    class="w-full bg-aqua-teal hover:bg-teal-700 text-white font-semibold py-3.5 rounded-xl
+                           transition duration-150 shadow-lg shadow-teal-900/20 text-sm">
+                    Create Account
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-slate-500 mt-6">
+                Already have an account?
+                <a href="{% url 'authentication:login' %}" class="text-aqua-teal font-bold hover:underline">
+                    Log in here
+                </a>
+            </p>
         </div>
     </div>
-</section>
+</div>
 {% endblock %}
 
 {% block extra_js %}
