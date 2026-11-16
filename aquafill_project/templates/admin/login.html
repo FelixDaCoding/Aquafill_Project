@@ -1,0 +1,251 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    body.login {
+        background-color: var(--bg-canvas) !important;
+    }
+
+    body.login #container {
+        background: transparent !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    body.login #main {
+        padding: 0 !important;
+        max-width: none !important;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    body.login #content {
+        padding: 56px 24px !important;
+        margin: 0 auto !important;
+        width: 100%;
+        max-width: 1080px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .af-admin-auth-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: radial-gradient(ellipse 80% 75% at 50% 40%, #000 55%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 40%, #000 55%, transparent 100%);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .af-admin-login-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 36px;
+        align-items: center;
+    }
+
+    .af-admin-login-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-hairline);
+        border-radius: 22px;
+        box-shadow: var(--shadow-lg);
+        padding: 34px;
+    }
+
+    .af-admin-field {
+        margin-bottom: 18px;
+    }
+
+    .af-admin-field label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+    }
+
+    .af-admin-field input {
+        width: 100% !important;
+        height: 44px;
+        padding: 0 14px !important;
+        border-radius: 11px !important;
+        border: 1px solid var(--border-strong) !important;
+        background: var(--bg-canvas) !important;
+        font-size: 14px !important;
+        box-sizing: border-box;
+        transition: all 0.15s ease;
+    }
+
+    .af-admin-field input:focus {
+        outline: none;
+        background: var(--bg-surface) !important;
+        border-color: var(--brand-ocean) !important;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    .af-autofill-box {
+        background: #F0F9FF;
+        border: 1px dashed #7DD3FC;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    @media (max-width: 860px) {
+        .af-admin-login-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block content %}
+<div class="af-admin-auth-bg"></div>
+
+<div class="af-admin-login-grid">
+    <!-- Left Column: CIT-U Janitorial & Telemetry Operations Overview -->
+    <div>
+        <div style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; background: #E0F2FE; border: 1px solid #BAE6FD; color: var(--brand-ocean-hover); font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; margin-bottom: 18px;">
+            <span class="af-live-dot"></span>
+            <span>CIT-U JANITORIAL &amp; FACILITIES COMMAND</span>
+        </div>
+
+        <h1 style="font-size: clamp(2rem, 3.3vw, 2.75rem); line-height: 1.12; margin: 0 0 16px 0;">
+            AquaFill Operations &amp; Telemetry Admin Portal
+        </h1>
+
+        <p style="font-size: 15.5px; color: var(--text-secondary); line-height: 1.65; margin: 0 0 26px 0;">
+            Authorized CIT-U Facilities staff and system administrators can manage water dispenser stations, dispatch 5-gallon refill crews, resolve maintenance tickets, and oversee campus user roles.
+        </p>
+
+        <div style="background: var(--bg-obsidian); border-radius: 18px; padding: 22px 24px; color: #F8FAFC; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <span class="font-mono-num" style="font-size: 11px; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: 0.06em;">
+                    DEFAULT ADMIN CREDENTIALS
+                </span>
+                <span class="af-heartbeat-pill" style="background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.3); color: #34D399; padding: 3px 9px;">
+                    Ready
+                </span>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-family: var(--font-mono); font-size: 13px;">
+                <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 10px;">
+                    <span style="color: #94A3B8; font-size: 11px; display: block;">Username</span>
+                    <strong style="color: #FFFFFF;">admin</strong>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 10px;">
+                    <span style="color: #94A3B8; font-size: 11px; display: block;">Password</span>
+                    <strong style="color: var(--brand-cyan);">admin12345</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Elevated Admin Authentication Card -->
+    <div class="af-admin-login-card">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <h2 style="font-size: 21px; margin: 0;">Administrator Sign In</h2>
+            <span class="af-campus-badge">STAFF AUTH</span>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 0 20px 0;">
+            Enter your CIT-U staff or superuser credentials to open the console.
+        </p>
+
+        <!-- 1-Click Auto-Fill Helper -->
+        <div class="af-autofill-box">
+            <div style="font-size: 12px; color: var(--text-secondary);">
+                <strong style="color: var(--brand-ocean-hover); display: block;">Quick Demo Access</strong>
+                <span class="font-mono-num">admin / admin12345</span>
+            </div>
+            <button type="button" id="autofill-admin-btn" class="af-btn af-btn-outline" style="padding: 6px 12px; font-size: 12px;">
+                Auto-Fill Credentials ⚡
+            </button>
+        </div>
+
+        {% if form.errors and not form.non_field_errors %}
+        <div style="margin-bottom: 16px; padding: 12px 14px; border-radius: 12px; background: var(--status-crit-bg); border: 1px solid var(--status-crit-border); color: var(--status-crit-text); font-size: 13px; font-weight: 600;">
+            {% blocktranslate count counter=form.errors.items|length %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktranslate %}
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+        <div style="margin-bottom: 16px; padding: 12px 14px; border-radius: 12px; background: var(--status-crit-bg); border: 1px solid var(--status-crit-border); color: var(--status-crit-text); font-size: 13px; font-weight: 600;">
+            {{ error }}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if user.is_authenticated %}
+        <div style="margin-bottom: 16px; padding: 12px 14px; border-radius: 12px; background: var(--status-low-bg); border: 1px solid var(--status-low-border); color: var(--status-low-text); font-size: 12.5px;">
+            You are authenticated as <strong>{{ username }}</strong>, but are not authorized to access this page. Sign in with a staff account below.
+        </div>
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form">
+            {% csrf_token %}
+            <div class="af-admin-field">
+                {{ form.username.errors }}
+                <label for="id_username">{{ form.username.label }}</label>
+                {{ form.username }}
+            </div>
+
+            <div class="af-admin-field">
+                {{ form.password.errors }}
+                <label for="id_password">{% translate 'Password:' %}</label>
+                {{ form.password }}
+                <input type="hidden" name="next" value="{{ next }}">
+            </div>
+
+            <button type="submit" class="af-btn af-btn-primary" style="width: 100%; min-height: 46px; font-size: 14px; margin-top: 6px;">
+                {% translate 'Sign In to Admin & Janitorial Console' %} &rarr;
+            </button>
+        </form>
+
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-hairline); display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+            <a href="{% url 'authentication:login' %}" style="color: var(--text-secondary); text-decoration: none;">
+                Student / Staff Login &rarr;
+            </a>
+            <a href="{% url 'home:home' %}" style="color: var(--brand-ocean); font-weight: 600; text-decoration: none;">
+                &larr; Live Dispenser Directory
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const autoBtn = document.getElementById('autofill-admin-btn');
+        const userInp = document.getElementById('id_username');
+        const passInp = document.getElementById('id_password');
+        if (autoBtn && userInp && passInp) {
+            autoBtn.addEventListener('click', function () {
+                userInp.value = 'admin';
+                passInp.value = 'admin12345';
+                userInp.focus();
+            });
+        }
+    });
+</script>
+{% endblock %}

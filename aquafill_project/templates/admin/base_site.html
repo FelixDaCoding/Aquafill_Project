@@ -1,0 +1,542 @@
+{% extends "admin/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | AquaFill CIT-U Admin Console{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+<!-- Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   AQUAFILL CIT-U ADMIN CONSOLE DESIGN SYSTEM OVERRIDES
+   ========================================================================== */
+:root,
+html[data-theme="light"],
+html[data-theme="dark"],
+html[data-theme="auto"] {
+    /* AquaFill Design System Tokens */
+    --bg-canvas: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F1F5F9;
+    --bg-obsidian: #0B1120;
+    --bg-obsidian-elevated: #111827;
+
+    --brand-ocean: #0284C7;
+    --brand-ocean-hover: #0369A1;
+    --brand-cyan: #06B6D4;
+    --brand-cyan-glow: rgba(6, 182, 212, 0.16);
+
+    --status-opt-text: #047857;
+    --status-opt-bg: #ECFDF5;
+    --status-opt-border: #A7F3D0;
+    --status-opt-dot: #10B981;
+
+    --status-low-text: #B45309;
+    --status-low-bg: #FFFBEB;
+    --status-low-border: #FDE68A;
+    --status-low-dot: #F59E0B;
+
+    --status-crit-text: #B91C1C;
+    --status-crit-bg: #FEF2F2;
+    --status-crit-border: #FECACA;
+    --status-crit-dot: #EF4444;
+
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #94A3B8;
+    --border-hairline: #E2E8F0;
+    --border-strong: #CBD5E1;
+
+    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 20px 35px -10px rgba(15, 23, 42, 0.10), 0 8px 16px -6px rgba(15, 23, 42, 0.04);
+
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Override Django Admin Native Variables */
+    --primary: #0284C7;
+    --secondary: #0F172A;
+    --accent: #06B6D4;
+    --primary-fg: #FFFFFF;
+    --body-fg: #0F172A;
+    --body-bg: #F8FAFC;
+    --body-quiet-color: #475569;
+    --body-loud-color: #0F172A;
+    --header-color: #0F172A;
+    --header-branding-color: #0F172A;
+    --header-bg: rgba(255, 255, 255, 0.88);
+    --header-link-color: #475569;
+    --breadcrumbs-fg: #475569;
+    --breadcrumbs-link-fg: #0284C7;
+    --breadcrumbs-bg: #F1F5F9;
+    --link-fg: #0284C7;
+    --link-hover-color: #0369A1;
+    --link-selected-fg: #0284C7;
+    --hairline-color: #E2E8F0;
+    --border-color: #CBD5E1;
+    --error-fg: #B91C1C;
+    --message-success-bg: #ECFDF5;
+    --message-warning-bg: #FFFBEB;
+    --message-error-bg: #FEF2F2;
+    --darkened-bg: #F1F5F9;
+    --selected-bg: #E0F2FE;
+    --selected-row: #F0F9FF;
+    --button-fg: #FFFFFF;
+    --button-bg: #0284C7;
+    --button-hover-bg: #0369A1;
+    --default-button-bg: #0284C7;
+    --default-button-hover-bg: #0369A1;
+    --close-button-bg: #64748B;
+    --close-button-hover-bg: #475569;
+    --delete-button-bg: #DC2626;
+    --delete-button-hover-bg: #B91C1C;
+    --object-tools-fg: #FFFFFF;
+    --object-tools-bg: #0284C7;
+    --object-tools-hover-bg: #0369A1;
+}
+
+body {
+    background-color: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-sans) !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, #content h1 {
+    font-family: var(--font-display) !important;
+    letter-spacing: -0.025em !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+}
+
+.af-container {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+.font-mono-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Section 1: Top Telemetry Ticker */
+.af-ticker {
+    min-height: 36px;
+    background-color: var(--bg-obsidian);
+    color: #F8FAFC;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.af-ticker-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.af-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--brand-cyan);
+    display: inline-block;
+    animation: afPulseCyan 2s infinite;
+}
+
+@keyframes afPulseCyan {
+    0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+    70% { box-shadow: 0 0 0 7px rgba(6, 182, 212, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+}
+
+@keyframes afPulseEmerald {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
+    70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Section 2: Sticky Glassmorphic Header Replacing Default Admin Header */
+#header {
+    height: auto !important;
+    min-height: 76px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.88) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-hairline) !important;
+    color: var(--text-primary) !important;
+    padding: 0 !important;
+    display: block !important;
+}
+
+.af-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 76px;
+    width: 100%;
+}
+
+.af-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none !important;
+    color: var(--text-primary) !important;
+}
+
+.af-logo-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand-ocean) 0%, var(--brand-cyan) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    box-shadow: 0 6px 16px -4px rgba(2, 132, 199, 0.45);
+    flex-shrink: 0;
+}
+
+.af-brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 21px;
+    letter-spacing: -0.03em;
+    color: var(--text-primary) !important;
+}
+
+.af-campus-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: #E0F2FE;
+    color: var(--brand-ocean);
+    border: 1px solid #BAE6FD;
+    letter-spacing: 0.02em;
+}
+
+.af-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.af-nav-link {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-secondary) !important;
+    text-decoration: none !important;
+    padding: 8px 13px;
+    border-radius: 9px;
+    transition: all 0.15s ease;
+}
+
+.af-nav-link:hover {
+    color: var(--text-primary) !important;
+    background: var(--bg-subtle);
+}
+
+.af-nav-link.active {
+    color: var(--brand-ocean) !important;
+    background: #E0F2FE;
+}
+
+.af-heartbeat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--status-opt-text);
+    background: var(--status-opt-bg);
+    border: 1px solid var(--status-opt-border);
+    padding: 6px 11px;
+    border-radius: 999px;
+}
+
+.af-heartbeat-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--status-opt-dot);
+    animation: afPulseEmerald 2s infinite;
+}
+
+.af-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.af-btn-outline {
+    background: var(--bg-surface);
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-sm);
+}
+
+.af-btn-outline:hover {
+    border-color: var(--brand-ocean);
+    color: var(--brand-ocean) !important;
+    background: #F0F9FF;
+}
+
+.af-btn-primary {
+    background: linear-gradient(135deg, var(--brand-ocean) 0%, #0369A1 100%);
+    color: #FFFFFF !important;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.af-btn-primary:hover {
+    background: linear-gradient(135deg, var(--brand-ocean-hover) 0%, #075985 100%);
+    transform: translateY(-1px);
+}
+
+/* Breadcrumbs & Content Container Polish */
+div.breadcrumbs {
+    background: var(--bg-subtle) !important;
+    color: var(--text-secondary) !important;
+    border-bottom: 1px solid var(--border-hairline);
+    padding: 12px 24px !important;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+div.breadcrumbs a {
+    color: var(--brand-ocean) !important;
+    font-weight: 600;
+}
+
+#container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#main {
+    flex: 1;
+    max-width: 1320px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 24px 0;
+}
+
+#content {
+    padding: 20px 24px !important;
+}
+
+/* Modern Bento Modules & Tables inside Django Admin */
+.module {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--shadow-sm) !important;
+    overflow: hidden;
+    margin-bottom: 24px !important;
+}
+
+.module h2, .module caption, .inline-group h2 {
+    background: var(--bg-subtle) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-display) !important;
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    padding: 13px 18px !important;
+    border-bottom: 1px solid var(--border-hairline) !important;
+}
+
+.module caption a.section:link,
+.module caption a.section:visited {
+    color: var(--text-primary) !important;
+}
+
+#changelist {
+    background: transparent !important;
+}
+
+#changelist .results {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+#changelist-filter {
+    background: var(--bg-surface) !important;
+    border: 1px solid var(--border-hairline) !important;
+    border-radius: 16px !important;
+    box-shadow: var(--shadow-sm);
+}
+
+#changelist-filter h2 {
+    background: var(--bg-subtle) !important;
+    color: var(--text-primary) !important;
+    border-radius: 16px 16px 0 0;
+}
+
+#nav-sidebar {
+    background: var(--bg-surface) !important;
+    border-right: 1px solid var(--border-hairline) !important;
+}
+
+input[type=text], input[type=password], input[type=email], input[type=url],
+input[type=number], textarea, select, .vTextField {
+    border: 1px solid var(--border-strong) !important;
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    background: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-sans) !important;
+}
+
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    border-radius: 10px !important;
+    font-family: var(--font-sans) !important;
+    font-weight: 600 !important;
+    padding: 10px 18px !important;
+}
+
+.object-tools a:link, .object-tools a:visited {
+    background: linear-gradient(135deg, var(--brand-ocean) 0%, #0369A1 100%) !important;
+    color: #FFFFFF !important;
+    border-radius: 999px !important;
+    padding: 7px 15px !important;
+    font-weight: 600 !important;
+}
+
+/* Section 9: Obsidian Footer */
+.af-footer {
+    background: var(--bg-obsidian);
+    color: #94A3B8;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 44px 0 30px;
+    margin-top: 48px;
+}
+
+/* Hide Django 4.2+ theme toggle button since we enforce unified CIT-U design tokens */
+.theme-toggle {
+    display: none !important;
+}
+
+@media (max-width: 960px) {
+    .af-nav-links,
+    .af-heartbeat-pill {
+        display: none;
+    }
+}
+</style>
+{% endblock %}
+
+{% block header %}
+<!-- Section 1: Obsidian Live Telemetry Ticker Strip -->
+<div class="af-ticker">
+    <div class="af-container af-ticker-inner">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="af-live-dot"></span>
+            <span class="font-mono-num" style="color: var(--brand-cyan); font-weight: 700;">CIT-U FACILITIES COMMAND:</span>
+            <span>Real-Time Water Station Management, Refill Dispatch &amp; Institutional User Administration</span>
+        </div>
+        <div class="font-mono-num" style="font-size: 11px; color: #94A3B8;">
+            AquaFill Admin v2.0
+        </div>
+    </div>
+</div>
+
+<!-- Section 2: Sticky Glassmorphic Navigation Header -->
+<div id="header">
+    <div class="af-container af-navbar-inner">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{% url 'admin:index' %}" class="af-brand">
+                <span class="af-logo-mark">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        <path d="M8 14c1.5 1.5 3.5 1.5 5 0s3.5-1.5 5 0"/>
+                    </svg>
+                </span>
+                <span class="af-brand-name">AquaFill</span>
+            </a>
+            <span class="af-campus-badge">CIT-U ADMIN CONSOLE</span>
+        </div>
+
+        <nav class="af-nav-links" aria-label="Admin & Campus Navigation">
+            <a href="{% url 'admin:index' %}" class="af-nav-link active">Admin Overview</a>
+            <a href="/admin/home/waterstation/" class="af-nav-link">Water Stations</a>
+            <a href="/admin/home/refillreport/" class="af-nav-link">Refill Tickets</a>
+            <a href="/admin/auth/user/" class="af-nav-link">Campus Users</a>
+            <a href="{% url 'home:home' %}" class="af-nav-link">Live Portal &rarr;</a>
+        </nav>
+
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="af-heartbeat-pill">
+                <span class="af-heartbeat-dot"></span>
+                <span>Telemetry Online</span>
+            </div>
+
+            <a href="{% url 'home:home' %}" class="af-btn af-btn-outline">
+                &larr; Live Dispenser Directory
+            </a>
+
+            {% if user.is_active and user.is_staff %}
+            <form id="logout-form" method="post" action="{% url 'admin:logout' %}" style="margin: 0; display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="af-btn af-btn-primary">
+                    Log Out ({{ user.get_username }})
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="af-footer">
+    <div class="af-container" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; font-size: 13px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <strong style="color: #FFFFFF; font-family: var(--font-display);">AquaFill CIT-U Admin &amp; Janitorial Console</strong>
+            <span>&bull;</span>
+            <span>Cebu Institute of Technology &ndash; University</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <a href="{% url 'home:home' %}" style="color: var(--brand-cyan); text-decoration: none; font-weight: 600;">Live Campus Directory</a>
+            <a href="{% url 'user_profile:profile' %}" style="color: #94A3B8; text-decoration: none;">Hydration Profile</a>
+            <a href="{% url 'user_settings:settings' %}" style="color: #94A3B8; text-decoration: none;">System Settings</a>
+        </div>
+    </div>
+</footer>
+{% endblock %}

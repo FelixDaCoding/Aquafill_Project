@@ -1,79 +1,222 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Login{% endblock %}
+{% block title %}Campus Sign In{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'authentication/css/auth.css' %}">
+<style>
+    .af-auth-section {
+        position: relative;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 24px;
+        overflow: hidden;
+    }
+
+    .af-auth-grid-bg {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+        background-size: 24px 24px;
+        mask-image: radial-gradient(ellipse 80% 75% at 50% 40%, #000 55%, transparent 100%);
+        -webkit-mask-image: radial-gradient(ellipse 80% 75% at 50% 40%, #000 55%, transparent 100%);
+        pointer-events: none;
+    }
+
+    .af-auth-layout {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 1060px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 40px;
+        align-items: center;
+    }
+
+    .af-auth-card {
+        background: var(--bg-surface);
+        border: 1px solid var(--border-hairline);
+        border-radius: 22px;
+        box-shadow: var(--shadow-lg);
+        padding: 34px;
+    }
+
+    @media (max-width: 860px) {
+        .af-auth-layout {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block site_header %}
+<!-- Top Telemetry Ticker Strip -->
+<div class="af-ticker">
+    <div class="af-container af-ticker-inner">
+        <div class="af-ticker-message">
+            <span class="af-live-dot"></span>
+            <span class="font-mono-num" style="color: var(--brand-cyan); font-weight: 700;">CIT-U HYDRATION NETWORK:</span>
+            <span>Real-time campus water dispenser telemetry across NGE, GLE, RTL, SAL &amp; Main buildings</span>
+        </div>
+        <div class="af-ticker-shortcuts">
+            <a href="/admin/login/?next=/admin/" class="af-ticker-tag">Admin &amp; Janitorial Login &rarr;</a>
+        </div>
+    </div>
+</div>
+
+<!-- Glassmorphic Header -->
+<header class="af-navbar">
+    <div class="af-container af-navbar-inner">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{% url 'authentication:login' %}" class="af-brand">
+                <span class="af-logo-mark">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        <path d="M8 14c1.5 1.5 3.5 1.5 5 0s3.5-1.5 5 0"/>
+                    </svg>
+                </span>
+                <span class="af-brand-name">AquaFill</span>
+            </a>
+            <span class="af-campus-badge">CIT-U CAMPUS</span>
+        </div>
+
+        <div class="af-nav-actions">
+            <div class="af-heartbeat-pill">
+                <span class="af-heartbeat-dot"></span>
+                <span>96% Network Online</span>
+            </div>
+            <a href="{% url 'authentication:register' %}" class="af-btn af-btn-outline">
+                Create Campus Account
+            </a>
+            <a href="/admin/login/?next=/admin/" class="af-btn af-btn-primary">
+                Janitorial &amp; Admin Portal
+            </a>
+        </div>
+    </div>
+</header>
 {% endblock %}
 
 {% block content %}
-<div class="flex-1 flex items-center justify-center auth-bg px-4 py-12 min-h-screen">
-    <div class="w-full max-w-md">
+<section class="af-auth-section">
+    <div class="af-auth-grid-bg"></div>
 
-        <!-- Brand header -->
-        <div class="text-center mb-6">
-            <div class="mx-auto h-20 w-20 rounded-3xl bg-white/10 backdrop-blur flex items-center justify-center mb-3 border border-white/20 shadow-xl p-3">
-                <img src="{% static 'authentication/images/water-drop.svg' %}" alt="AquaFill Logo" class="h-14 w-14">
+    <div class="af-auth-layout">
+        <!-- Left Column: Value Proposition -->
+        <div>
+            <div class="af-eyebrow">
+                <span class="af-live-dot"></span>
+                <span>REAL-TIME CAMPUS WATER &amp; MAINTENANCE SYSTEM</span>
             </div>
-            <h1 class="text-3xl font-black text-white tracking-wide">AquaFill</h1>
-            <p class="text-cyan-100 text-sm mt-1">Campus Water Dispenser &amp; Facility Management</p>
+
+            <h1 class="font-display" style="font-size: clamp(2rem, 3.4vw, 2.85rem); font-weight: 800; line-height: 1.12; margin: 0 0 16px 0;">
+                Check Campus Water Dispensers Before You Walk.
+            </h1>
+
+            <p style="font-size: 15.5px; color: var(--text-secondary); line-height: 1.65; margin: 0 0 26px 0;">
+                Sign in with your CIT-U account to view live water tank levels, chilled/hot tap temperatures, and sanitation logs across NGE, GLE, RTL, SAL, and Main buildings—or dispatch a refill request in one click.
+            </p>
+
+            <div style="background: var(--bg-obsidian); border-radius: 18px; padding: 20px 24px; color: #F8FAFC; border: 1px solid rgba(255,255,255,0.08);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                    <span class="font-mono-num" style="font-size: 11px; font-weight: 700; color: var(--brand-cyan); text-transform: uppercase; letter-spacing: 0.06em;">
+                        DEMO LOGIN ACCOUNT
+                    </span>
+                    <button type="button" id="autofill-demo-btn" class="af-ticker-tag" style="padding: 4px 10px;">
+                        Click to Auto-Fill ⚡
+                    </button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-family: var(--font-mono); font-size: 13px;">
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 10px;">
+                        <span style="color: #94A3B8; font-size: 11px; display: block;">Username</span>
+                        <strong style="color: #FFFFFF;">admin</strong>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.05); padding: 10px 12px; border-radius: 10px;">
+                        <span style="color: #94A3B8; font-size: 11px; display: block;">Password</span>
+                        <strong style="color: var(--brand-cyan);">admin12345</strong>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Card -->
-        <div class="bg-white rounded-3xl shadow-2xl p-8 border border-slate-100">
-            <h2 class="text-xl font-bold text-aqua-navy mb-1">Welcome back</h2>
-            <p class="text-slate-500 text-sm mb-6">Sign in to access your campus dashboard.</p>
+        <!-- Right Column: Login Card -->
+        <div class="af-auth-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                <h2 class="font-display" style="font-size: 22px; font-weight: 800; margin: 0;">Welcome back</h2>
+                <span class="af-unit-code">CIT-U SSO</span>
+            </div>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 0 22px 0;">
+                Sign in to access the live CIT-U hydration telemetry portal.
+            </p>
 
             <form method="post" action="{% url 'authentication:login' %}" novalidate>
                 {% csrf_token %}
 
                 {% if form.non_field_errors %}
-                <div class="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+                <div style="margin-bottom: 16px; padding: 12px 14px; border-radius: 12px; background: var(--status-crit-bg); border: 1px solid var(--status-crit-border); color: var(--status-crit-text); font-size: 13px; font-weight: 600;">
                     {% for error in form.non_field_errors %}
-                        <p>{{ error }}</p>
+                        <p style="margin: 0;">{{ error }}</p>
                     {% endfor %}
                 </div>
                 {% endif %}
 
-                <div class="mb-4">
-                    <label for="{{ form.username.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                <div style="margin-bottom: 16px;">
+                    <label for="{{ form.username.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
                         Username
                     </label>
                     {{ form.username }}
                     {% if form.username.errors %}
-                        <p class="mt-1 text-xs text-red-600">{{ form.username.errors.0 }}</p>
+                        <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.username.errors.0 }}</p>
                     {% endif %}
                 </div>
 
-                <div class="mb-6">
-                    <label for="{{ form.password.id_for_label }}" class="block text-xs font-bold uppercase tracking-wider text-aqua-navy mb-1.5">
+                <div style="margin-bottom: 22px;">
+                    <label for="{{ form.password.id_for_label }}" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">
                         Password
                     </label>
                     {{ form.password }}
                     {% if form.password.errors %}
-                        <p class="mt-1 text-xs text-red-600">{{ form.password.errors.0 }}</p>
+                        <p style="margin-top: 4px; font-size: 12px; color: var(--status-crit-text);">{{ form.password.errors.0 }}</p>
                     {% endif %}
                 </div>
 
-                <button type="submit"
-                    class="w-full bg-aqua-teal hover:bg-teal-700 text-white font-semibold py-3.5 rounded-xl
-                           transition duration-150 shadow-lg shadow-teal-900/20 text-sm">
-                    Log In to Dashboard
+                <button type="submit" class="af-btn af-btn-primary" style="width: 100%; min-height: 46px; font-size: 14px;">
+                    Log In to Telemetry Portal &rarr;
                 </button>
             </form>
 
-            <p class="text-center text-xs text-slate-500 mt-6">
-                Don't have an account yet?
-                <a href="{% url 'authentication:register' %}" class="text-aqua-teal font-bold hover:underline">
-                    Register here
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-hairline); display: flex; justify-content: space-between; align-items: center; font-size: 12.5px;">
+                <span style="color: var(--text-secondary);">
+                    New to AquaFill?
+                    <a href="{% url 'authentication:register' %}" style="color: var(--brand-ocean); font-weight: 700; text-decoration: none;">
+                        Create account
+                    </a>
+                </span>
+                <a href="/admin/login/?next=/admin/" style="color: var(--text-secondary); text-decoration: none;">
+                    Admin Console &rarr;
                 </a>
-            </p>
+            </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'authentication/js/auth.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const btn = document.getElementById('autofill-demo-btn');
+        const u = document.getElementById('id_username');
+        const p = document.getElementById('id_password');
+        if (btn && u && p) {
+            btn.addEventListener('click', function () {
+                u.value = 'admin';
+                p.value = 'admin12345';
+                u.focus();
+            });
+        }
+    });
+</script>
 {% endblock %}
