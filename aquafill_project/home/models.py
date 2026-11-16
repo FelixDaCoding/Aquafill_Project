@@ -38,11 +38,69 @@ class WaterStation(models.Model):
 
     @property
     def level_badge_color(self):
-        if self.current_level_percentage > 40:
+        if self.current_level_percentage >= 40:
             return 'teal'
-        elif self.current_level_percentage > 15:
+        elif self.current_level_percentage >= 15:
             return 'amber'
         return 'rose'
+
+    @property
+    def code(self):
+        b = (self.building or '').upper()
+        if 'NGE' in b or 'ENGINEERING' in b or 'CEA' in b:
+            prefix = 'NGE'
+        elif 'GLE' in b or 'COMPUTER' in b or 'CCS' in b:
+            prefix = 'GLE'
+        elif 'RTL' in b or 'LIBRARY' in b or 'LRC' in b:
+            prefix = 'RTL'
+        elif 'SAL' in b or 'SCIENCE' in b or 'ALLIED' in b:
+            prefix = 'SAL'
+        else:
+            prefix = 'MAIN'
+        return f'DSP-{prefix}-{self.id or 1:02d}'
+
+    @property
+    def building_group(self):
+        b = (self.building or '').upper()
+        if 'NGE' in b or 'ENGINEERING' in b or 'CEA' in b:
+            return 'NGE Building'
+        elif 'GLE' in b or 'COMPUTER' in b or 'CCS' in b:
+            return 'GLE Building'
+        elif 'RTL' in b or 'LIBRARY' in b or 'LRC' in b:
+            return 'RTL Building'
+        elif 'SAL' in b or 'SCIENCE' in b or 'ALLIED' in b:
+            return 'SAL Building'
+        return 'Main / Admin'
+
+    @property
+    def location(self):
+        return self.name
+
+    @property
+    def water_level(self):
+        return self.current_level_percentage
+
+    @property
+    def last_refilled(self):
+        return self.last_refilled_at
+
+    @property
+    def status_category(self):
+        if self.status in [self.Status.MAINTENANCE, self.Status.OFFLINE] or self.current_level_percentage < 15:
+            if self.status == self.Status.LOW_WATER and self.current_level_percentage >= 15:
+                return 'low_water'
+            return 'maintenance' if self.status in [self.Status.MAINTENANCE, self.Status.OFFLINE] else 'low_water'
+        if self.status == self.Status.LOW_WATER or self.current_level_percentage < 40:
+            return 'low_water'
+        return 'operational'
+
+    @property
+    def temp_capabilities(self):
+        if self.status in [self.Status.MAINTENANCE, self.Status.OFFLINE]:
+            return 'warm'
+        if self.temperature_celsius <= 11.0:
+            return 'cold,warm,hot'
+        return 'warm,hot'
 
 
 class RefillReport(models.Model):

@@ -23,14 +23,24 @@ def home_view(request):
     total_stations = stations.count()
     online_stations = stations.filter(status=WaterStation.Status.ONLINE).count()
     low_water_stations = stations.filter(status=WaterStation.Status.LOW_WATER).count()
+    maintenance_stations = stations.filter(
+        status__in=[WaterStation.Status.MAINTENANCE, WaterStation.Status.OFFLINE]
+    ).count()
     pending_reports = RefillReport.objects.filter(status=RefillReport.ReportStatus.PENDING).count()
+    logs = RefillReport.objects.select_related('station', 'reported_by').all()[:8]
 
     # If database is fresh and unseeded, supply default metrics so page looks great
     if total_stations == 0:
         total_stations = 8
         online_stations = 6
         low_water_stations = 1
+        maintenance_stations = 1
         pending_reports = 1
+
+    readiness_pct = round(((online_stations + (low_water_stations * 0.5)) / max(total_stations, 1)) * 100)
+    operational_pct = round((online_stations / max(total_stations, 1)) * 100)
+    low_water_pct = round((low_water_stations / max(total_stations, 1)) * 100)
+    maintenance_pct = max(0, 100 - operational_pct - low_water_pct)
 
     stats = [
         {
@@ -43,7 +53,7 @@ def home_view(request):
         {
             'label': 'Low Supply Alerts',
             'value': low_water_stations,
-            'description': 'Units under 15% capacity',
+            'description': 'Units under 40% capacity',
             'badge': 'Attention',
             'badge_color': 'amber',
         },
@@ -67,7 +77,18 @@ def home_view(request):
 
     context = {
         'stations': stations,
+        'dispensers': stations,
+        'logs': logs,
         'stats': stats,
+        'total_stations': total_stations,
+        'online_stations': online_stations,
+        'low_water_stations': low_water_stations,
+        'maintenance_stations': maintenance_stations,
+        'pending_reports': pending_reports,
+        'readiness_pct': readiness_pct,
+        'operational_pct': operational_pct,
+        'low_water_pct': low_water_pct,
+        'maintenance_pct': maintenance_pct,
         'profile': profile,
         'profile_details': profile_details,
         'report_form': report_form,

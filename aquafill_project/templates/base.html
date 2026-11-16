@@ -30,6 +30,7 @@
 </head>
 <body class="bg-aqua-soft text-slate-800 min-h-screen flex flex-col font-sans">
 
+    {% block site_header %}
     <!-- Global App Header / Navigation (shown when user is logged in) -->
     {% if user.is_authenticated %}
     <header class="bg-aqua-navy text-white shadow-lg sticky top-0 z-40">
@@ -95,6 +96,7 @@
         </div>
     </header>
     {% endif %}
+    {% endblock %}
 
     <!-- Django Message Notifications Banner -->
     {% if messages %}
@@ -117,6 +119,7 @@
         {% block content %}{% endblock %}
     </main>
 
+    {% block site_footer %}
     <!-- Global Footer -->
     <footer class="bg-white border-t border-slate-200/80 text-center text-xs text-slate-400 py-6 mt-auto">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -128,6 +131,7 @@
             </div>
         </div>
     </footer>
+    {% endblock %}
 
     {% block extra_js %}{% endblock %}
 </body>

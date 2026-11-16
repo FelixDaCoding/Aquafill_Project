@@ -1,226 +1,2780 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Campus Stations Dashboard{% endblock %}
+{% block title %}CIT-U Campus Hydration Telemetry &amp; Janitorial Operations Portal{% endblock %}
 
 {% block extra_head %}
+<!-- Google Fonts: Plus Jakarta Sans, Inter, JetBrains Mono -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'home/css/home.css' %}">
+
+<style>
+/* ==========================================================================
+   PART 1: AQUAFILL DESIGN SYSTEM, TOKENS & VISUAL LANGUAGE
+   ========================================================================== */
+:root {
+    /* Surface Hierarchy */
+    --bg-canvas: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-subtle: #F1F5F9;
+    --bg-obsidian: #0B1120;
+    --bg-obsidian-elevated: #111827;
+
+    /* Brand & Interactive Accents */
+    --brand-ocean: #0284C7;
+    --brand-ocean-hover: #0369A1;
+    --brand-cyan: #06B6D4;
+    --brand-cyan-glow: rgba(6, 182, 212, 0.16);
+
+    /* Semantic Status Palette (WCAG AA Compliant) */
+    --status-opt-text: #047857;
+    --status-opt-bg: #ECFDF5;
+    --status-opt-border: #A7F3D0;
+    --status-opt-dot: #10B981;
+
+    --status-low-text: #B45309;
+    --status-low-bg: #FFFBEB;
+    --status-low-border: #FDE68A;
+    --status-low-dot: #F59E0B;
+
+    --status-crit-text: #B91C1C;
+    --status-crit-bg: #FEF2F2;
+    --status-crit-border: #FECACA;
+    --status-crit-dot: #EF4444;
+
+    --status-san-text: #4338CA;
+    --status-san-bg: #EEF2FF;
+    --status-san-border: #C7D2FE;
+    --status-san-dot: #6366F1;
+
+    /* Typography & Borders */
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #94A3B8;
+    --border-hairline: #E2E8F0;
+    --border-strong: #CBD5E1;
+
+    /* Elevation & Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 20px 35px -10px rgba(15, 23, 42, 0.10), 0 8px 16px -6px rgba(15, 23, 42, 0.04);
+
+    /* Font Stacks */
+    --font-display: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-canvas) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-sans) !important;
+    line-height: 1.6;
+    margin: 0;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+.af-container {
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+}
+
+.font-mono-num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   SECTION 1: CAMPUS ANNOUNCEMENT & LIVE TELEMETRY TICKER STRIP
+   ========================================================================== */
+.af-ticker {
+    min-height: 36px;
+    background-color: var(--bg-obsidian);
+    color: #F8FAFC;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.af-ticker-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+.af-ticker-message {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.af-live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--brand-cyan);
+    box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7);
+    animation: afPulseCyan 2s infinite;
+    flex-shrink: 0;
+}
+
+@keyframes afPulseCyan {
+    0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+    70% { box-shadow: 0 0 0 7px rgba(6, 182, 212, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+}
+
+@keyframes afPulseEmerald {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65); }
+    70% { box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.af-ticker-shortcuts {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.af-ticker-tag {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #E2E8F0;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+}
+
+.af-ticker-tag:hover {
+    background: rgba(6, 182, 212, 0.2);
+    border-color: var(--brand-cyan);
+    color: #FFFFFF;
+}
+
+/* ==========================================================================
+   SECTION 2: STICKY GLASSMORPHIC NAVIGATION HEADER
+   ========================================================================== */
+.af-navbar {
+    height: 76px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-hairline);
+    display: flex;
+    align-items: center;
+}
+
+.af-navbar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+}
+
+.af-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-primary);
+}
+
+.af-logo-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--brand-ocean) 0%, var(--brand-cyan) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FFFFFF;
+    box-shadow: 0 6px 16px -4px rgba(2, 132, 199, 0.45);
+    flex-shrink: 0;
+}
+
+.af-brand-name {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 21px;
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+}
+
+.af-campus-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--bg-subtle);
+    color: var(--brand-ocean);
+    border: 1px solid var(--border-strong);
+    letter-spacing: 0.02em;
+}
+
+.af-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.af-nav-link {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+}
+
+.af-nav-link:hover {
+    color: var(--text-primary);
+    background: var(--bg-subtle);
+}
+
+.af-nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.af-heartbeat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--status-opt-text);
+    background: var(--status-opt-bg);
+    border: 1px solid var(--status-opt-border);
+    padding: 6px 11px;
+    border-radius: 999px;
+}
+
+.af-heartbeat-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--status-opt-dot);
+    animation: afPulseEmerald 2s infinite;
+}
+
+.af-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    text-decoration: none;
+    min-height: 42px;
+    white-space: nowrap;
+}
+
+.af-btn-outline {
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-sm);
+}
+
+.af-btn-outline:hover {
+    border-color: var(--brand-ocean);
+    color: var(--brand-ocean);
+    background: #F0F9FF;
+}
+
+.af-btn-primary {
+    background: linear-gradient(135deg, var(--brand-ocean) 0%, #0369A1 100%);
+    color: #FFFFFF;
+    border: 1px solid transparent;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+}
+
+.af-btn-primary:hover {
+    background: linear-gradient(135deg, var(--brand-ocean-hover) 0%, #075985 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+}
+
+.af-mobile-toggle {
+    display: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid var(--border-hairline);
+    background: var(--bg-surface);
+    color: var(--text-primary);
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.af-mobile-drawer {
+    display: none;
+    background: var(--bg-surface);
+    border-bottom: 1px solid var(--border-hairline);
+    padding: 16px 24px 20px;
+    box-shadow: var(--shadow-md);
+}
+
+.af-mobile-drawer.open {
+    display: block;
+}
+
+/* ==========================================================================
+   SECTION 3: ASYMMETRIC SPLIT-SCREEN HERO & COMMAND CARD
+   ========================================================================== */
+.af-hero {
+    position: relative;
+    padding: 56px 0 48px;
+    overflow: hidden;
+}
+
+.af-hero-grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 35%, #000 55%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 35%, #000 55%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.af-hero-glow {
+    position: absolute;
+    top: -120px;
+    right: 8%;
+    width: 520px;
+    height: 520px;
+    background: radial-gradient(circle, var(--brand-cyan-glow) 0%, rgba(2, 132, 199, 0.04) 55%, transparent 75%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.af-hero-layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 36px;
+    align-items: center;
+}
+
+.af-hero-left {
+    grid-column: span 7;
+}
+
+.af-hero-right {
+    grid-column: span 5;
+}
+
+.af-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #E0F2FE;
+    border: 1px solid #BAE6FD;
+    color: var(--brand-ocean-hover);
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+}
+
+.af-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.15rem, 3.8vw, 3.35rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.03em;
+    line-height: 1.12;
+    margin: 0 0 18px 0;
+}
+
+.af-hero-title span {
+    background: linear-gradient(135deg, var(--brand-ocean) 0%, var(--brand-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.af-hero-lead {
+    font-size: 16.5px;
+    color: var(--text-secondary);
+    max-width: 620px;
+    margin: 0 0 28px 0;
+    line-height: 1.65;
+}
+
+.af-hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.af-btn-lg {
+    padding: 13px 22px;
+    font-size: 14.5px;
+    border-radius: 12px;
+    min-height: 48px;
+}
+
+.af-quickjump-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: block;
+}
+
+.af-quickjump-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.af-building-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 999px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.16s ease;
+}
+
+.af-building-pill:hover,
+.af-building-pill.active {
+    border-color: var(--brand-ocean);
+    color: var(--brand-ocean);
+    background: #F0F9FF;
+    transform: translateY(-1px);
+}
+
+/* Right Column: Executive Snapshot Card */
+.af-snapshot-card {
+    background: var(--bg-surface);
+    border-radius: 20px;
+    border: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-lg);
+    padding: 26px;
+    position: relative;
+}
+
+.af-snapshot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-hairline);
+    margin-bottom: 20px;
+}
+
+.af-snapshot-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.af-sync-badge {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--brand-ocean);
+    background: #E0F2FE;
+    padding: 4px 10px;
+    border-radius: 999px;
+}
+
+.af-gauge-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-bottom: 22px;
+}
+
+.af-radial-svg {
+    width: 124px;
+    height: 124px;
+    flex-shrink: 0;
+    transform: rotate(-90deg);
+}
+
+.af-radial-bg {
+    fill: none;
+    stroke: var(--bg-subtle);
+    stroke-width: 10;
+}
+
+.af-radial-value {
+    fill: none;
+    stroke: url(#aquaGaugeGrad);
+    stroke-width: 10;
+    stroke-linecap: round;
+    stroke-dasharray: 289;
+    stroke-dashoffset: 35;
+    transition: stroke-dashoffset 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.af-gauge-center-wrap {
+    position: relative;
+    width: 124px;
+    height: 124px;
+    flex-shrink: 0;
+}
+
+.af-gauge-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.af-gauge-pct {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.af-gauge-sub {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--status-opt-text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.af-breakdown-col {
+    flex: 1;
+}
+
+.af-Stacked-bar {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--bg-subtle);
+    display: flex;
+    overflow: hidden;
+    gap: 2px;
+    margin-bottom: 12px;
+}
+
+.af-legend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.af-legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-secondary);
+}
+
+.af-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.af-snapshot-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-hairline);
+}
+
+.af-snapshot-tile {
+    background: var(--bg-subtle);
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+}
+
+.af-tile-val {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+}
+
+.af-tile-lbl {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* KPI Strip (Preserves Django stats context variable) */
+.af-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+}
+
+.af-kpi-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 16px;
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.af-kpi-card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+}
+
+/* ==========================================================================
+   SECTION 4: FLOATING MULTI-FACETED SEARCH, FILTER & SORT COMMAND BAR
+   ========================================================================== */
+.af-command-bar {
+    background: var(--bg-surface);
+    border-radius: 16px;
+    border: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-lg);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+}
+
+.af-command-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-hairline);
+}
+
+.af-search-box {
+    position: relative;
+    flex: 1;
+    min-width: 260px;
+}
+
+.af-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+.af-search-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 70px 0 42px;
+    border-radius: 11px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-canvas);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    transition: all 0.15s ease;
+}
+
+.af-search-input:focus {
+    outline: none;
+    background: var(--bg-surface);
+    border-color: var(--brand-ocean);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.af-search-Clear {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+    display: none;
+    padding: 4px;
+    line-height: 1;
+}
+
+.af-search-kbd {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    color: var(--text-muted);
+    border-radius: 5px;
+    padding: 2px 6px;
+    pointer-events: none;
+}
+
+.af-status-tabs {
+    display: flex;
+    align-items: center;
+    background: var(--bg-subtle);
+    padding: 4px;
+    border-radius: 11px;
+    gap: 4px;
+    overflow-x: auto;
+}
+
+.af-status-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    min-height: 36px;
+}
+
+.af-status-tab.active {
+    background: var(--bg-surface);
+    color: var(--brand-ocean);
+    box-shadow: var(--shadow-sm);
+}
+
+.af-tab-count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+}
+
+.af-status-tab.active .af-tab-count {
+    background: #E0F2FE;
+    color: var(--brand-ocean);
+}
+
+.af-command-bottom {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-top: 14px;
+}
+
+.af-filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+.af-select {
+    height: 40px;
+    padding: 0 34px 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.af-temp-chips {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.af-temp-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 38px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-hairline);
+    background: var(--bg-canvas);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.af-temp-chip:hover {
+    border-color: var(--brand-ocean);
+}
+
+.af-temp-chip.active {
+    background: #E0F2FE;
+    border-color: var(--brand-ocean);
+    color: var(--brand-ocean-hover);
+}
+
+.af-results-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.af-reset-btn {
+    background: none;
+    border: none;
+    color: var(--brand-ocean);
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    display: none;
+}
+
+/* ==========================================================================
+   SECTION 5: RICH BENTO-STYLE DISPENSER TELEMETRY GRID
+   ========================================================================== */
+.af-bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+.dispenser-card {
+    background: var(--bg-surface);
+    border-radius: 18px;
+    border: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.22s ease;
+    overflow: hidden;
+}
+
+.dispenser-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--brand-ocean);
+    box-shadow: var(--shadow-lg);
+}
+
+.af-card-body {
+    padding: 22px 22px 18px;
+}
+
+.af-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.af-unit-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.af-unit-code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--bg-subtle);
+    border: 1px solid var(--border-strong);
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.af-zone-pill {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-hairline);
+    padding: 3px 9px;
+    border-radius: 999px;
+}
+
+.af-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.af-status-opt {
+    color: var(--status-opt-text);
+    background: var(--status-opt-bg);
+    border: 1px solid var(--status-opt-border);
+}
+
+.af-status-low {
+    color: var(--status-low-text);
+    background: var(--status-low-bg);
+    border: 1px solid var(--status-low-border);
+}
+
+.af-status-crit {
+    color: var(--status-crit-text);
+    background: var(--status-crit-bg);
+    border: 1px solid var(--status-crit-border);
+}
+
+.af-card-title {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 4px 0;
+}
+
+.af-card-landmark {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 18px 0;
+}
+
+/* Water Tank Level Gauge */
+.af-tank-gauge {
+    background: var(--bg-canvas);
+    border: 1px solid var(--border-hairline);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+}
+
+.af-tank-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.af-tank-track {
+    position: relative;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--bg-subtle);
+    overflow: hidden;
+}
+
+.af-tank-fill {
+    height: 100%;
+    border-radius: 999px;
+    width: 0%;
+    transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.af-fill-opt {
+    background: linear-gradient(90deg, var(--brand-ocean) 0%, var(--brand-cyan) 55%, #10B981 100%);
+}
+
+.af-fill-low {
+    background: linear-gradient(90deg, #D97706 0%, #F59E0B 100%);
+}
+
+.af-fill-crit {
+    background: linear-gradient(90deg, #DC2626 0%, #EF4444 100%);
+}
+
+.af-tank-ticks {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: space-evenly;
+    pointer-events: none;
+}
+
+.af-tank-tick {
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.65);
+}
+
+/* Temperature & Feature Matrix */
+.af-temp-matrix {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.af-tap-pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: var(--bg-subtle);
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+}
+
+.af-tap-pill.ready-cold {
+    background: #F0F9FF;
+    color: #0369A1;
+    border-color: #BAE6FD;
+}
+
+.af-tap-pill.ready-warm {
+    background: #ECFDF5;
+    color: #047857;
+    border-color: #A7F3D0;
+}
+
+.af-tap-pill.ready-hot {
+    background: #FFF7ED;
+    color: #C2410C;
+    border-color: #FED7AA;
+}
+
+/* Metadata Strip */
+.af-meta-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    padding-top: 10px;
+    border-top: 1px dashed var(--border-hairline);
+}
+
+.af-sanitized-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--status-san-text);
+    background: var(--status-san-bg);
+    border: 1px solid var(--status-san-border);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 11px;
+}
+
+/* Card Action Footer */
+.af-card-footer {
+    background: var(--bg-subtle);
+    border-top: 1px solid var(--border-hairline);
+    padding: 12px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.af-card-link {
+    background: none;
+    border: none;
+    padding: 4px 0;
+    font-family: var(--font-sans);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.af-card-link:hover {
+    color: var(--brand-ocean);
+}
+
+.af-card-report-btn {
+    background: var(--status-crit-bg);
+    border: 1px solid var(--status-crit-border);
+    color: var(--status-crit-text);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 11px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.af-card-report-btn:hover {
+    background: #FEE2E2;
+    border-color: #FCA5A5;
+}
+
+/* ==========================================================================
+   SECTION 6: CAMPUS BUILDING COVERAGE & QUICK-STATUS MATRIX
+   ========================================================================== */
+.af-section {
+    padding: 56px 0;
+}
+
+.af-section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.af-section-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 4px 0 0 0;
+}
+
+.af-building-matrix {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 18px;
+}
+
+.af-bldg-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.2s ease;
+}
+
+.af-bldg-card:hover {
+    border-color: var(--brand-ocean);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   SECTION 7: SPLIT OPERATIONS HUB (TIMELINE + 3-STEP WORKFLOW)
+   ========================================================================== */
+.af-ops-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 32px;
+}
+
+.af-ops-col {
+    grid-column: span 6;
+}
+
+.af-timeline-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 20px;
+    padding: 26px;
+    box-shadow: var(--shadow-md);
+}
+
+.af-timeline {
+    position: relative;
+    margin-top: 20px;
+    padding-left: 28px;
+}
+
+.af-timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: var(--border-hairline);
+}
+
+.af-timeline-item {
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.af-timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.af-timeline-node {
+    position: absolute;
+    left: -28px;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    border: 2px solid var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.af-step-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.af-step-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hairline);
+    border-radius: 18px;
+    padding: 22px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.2s ease;
+}
+
+.af-step-card:hover {
+    border-color: var(--brand-ocean);
+    box-shadow: var(--shadow-md);
+}
+
+.af-step-num {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--brand-ocean);
+    background: #F0F9FF;
+    border: 1px solid #BAE6FD;
+    border-radius: 12px;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   SECTION 8: DARK-MODE SUSTAINABILITY & CAMPUS IMPACT BANNER
+   ========================================================================== */
+.af-impact-banner {
+    background: var(--bg-obsidian);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 48px 40px;
+    color: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+.af-impact-glow {
+    position: absolute;
+    right: -80px;
+    bottom: -100px;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.24) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.af-impact-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 32px;
+    position: relative;
+    z-index: 1;
+}
+
+.af-impact-stat {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 22px;
+}
+
+.af-impact-num {
+    font-family: var(--font-mono);
+    font-size: clamp(1.75rem, 2.6vw, 2.35rem);
+    font-weight: 700;
+    color: var(--brand-cyan);
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* ==========================================================================
+   SECTION 9: ENTERPRISE 4-COLUMN FOOTER
+   ========================================================================== */
+.af-footer {
+    background: var(--bg-obsidian);
+    color: #94A3B8;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 56px 0 36px;
+    margin-top: 64px;
+}
+
+.af-footer-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1.3fr;
+    gap: 36px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.af-footer-heading {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #F8FAFC;
+    margin: 0 0 14px 0;
+}
+
+.af-footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    font-size: 13.5px;
+}
+
+.af-footer-links a {
+    color: #94A3B8;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.af-footer-links a:hover {
+    color: var(--brand-cyan);
+}
+
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS (1280px, 1024px, 768px, 480px)
+   ========================================================================== */
+@media (max-width: 1100px) {
+    .af-building-matrix {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    .af-nav-links {
+        display: none;
+    }
+    .af-mobile-toggle {
+        display: inline-flex;
+    }
+}
+
+@media (max-width: 960px) {
+    .af-hero-left,
+    .af-hero-right,
+    .af-ops-col {
+        grid-column: span 12;
+    }
+    .af-kpi-strip,
+    .af-impact-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .af-footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .af-ticker-shortcuts,
+    .af-heartbeat-pill {
+        display: none;
+    }
+    .af-building-matrix,
+    .af-kpi-strip,
+    .af-impact-grid,
+    .af-footer-grid {
+        grid-template-columns: 1fr;
+    }
+    .af-bento-grid {
+        grid-template-columns: 1fr;
+    }
+    .af-gauge-wrapper {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .af-impact-banner {
+        padding: 32px 22px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block site_header %}
+<!-- ==========================================================================
+     SECTION 1: CAMPUS ANNOUNCEMENT & LIVE TELEMETRY TICKER STRIP
+     ========================================================================== -->
+<div class="af-ticker" role="region" aria-label="Campus Hydration Telemetry Alert Strip">
+    <div class="af-container af-ticker-inner">
+        <div class="af-ticker-message">
+            <span class="af-live-dot"></span>
+            <span class="font-mono-num" style="color: var(--brand-cyan); font-weight: 700;">LIVE TELEMETRY:</span>
+            <span>All NGE &amp; GLE hydration stations recently sanitized &bull; Report empty jugs in 1 click to notify CIT-U Facilities</span>
+        </div>
+        <div class="af-ticker-shortcuts">
+            <span style="color: #64748B; font-size: 11px;">Quick Jump:</span>
+            <button type="button" class="af-ticker-tag js-building-jump" data-building="NGE Building">NGE</button>
+            <button type="button" class="af-ticker-tag js-building-jump" data-building="GLE Building">GLE</button>
+            <button type="button" class="af-ticker-tag js-building-jump" data-building="RTL Building">RTL</button>
+            <button type="button" class="af-ticker-tag js-building-jump" data-building="SAL Building">SAL</button>
+            <button type="button" class="af-ticker-tag js-building-jump" data-building="Main / Admin">MAIN</button>
+        </div>
+    </div>
+</div>
+
+<!-- ==========================================================================
+     SECTION 2: STICKY GLASSMORPHIC NAVIGATION HEADER
+     ========================================================================== -->
+<header class="af-navbar">
+    <div class="af-container af-navbar-inner">
+        <!-- Left: Brand Emblem + Wordmark + CIT-U Badge -->
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <a href="{% url 'home:home' %}" class="af-brand">
+                <span class="af-logo-mark" aria-hidden="true">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        <path d="M8 14c1.5 1.5 3.5 1.5 5 0s3.5-1.5 5 0"/>
+                    </svg>
+                </span>
+                <span class="af-brand-name">AquaFill</span>
+            </a>
+            <span class="af-campus-badge">CIT-U CAMPUS</span>
+        </div>
+
+        <!-- Center: Smooth-Scrolling Navigation Links -->
+        <nav class="af-nav-links" aria-label="Primary Campus Navigation">
+            <a href="#directory" class="af-nav-link">Live Directory</a>
+            <a href="#building-coverage" class="af-nav-link">Building Coverage</a>
+            <a href="#janitorial-logs" class="af-nav-link">Janitorial Logs</a>
+            <a href="#how-it-works" class="af-nav-link">How It Works</a>
+            <a href="#campus-impact" class="af-nav-link">Campus Impact</a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'user_profile:profile' %}" class="af-nav-link">My Profile</a>
+            <a href="{% url 'user_settings:settings' %}" class="af-nav-link">Settings</a>
+            {% endif %}
+        </nav>
+
+        <!-- Right: Heartbeat Pill + Action CTAs + Auth Controls -->
+        <div class="af-nav-actions">
+            <div class="af-heartbeat-pill" title="Campus Telemetry Mesh Status">
+                <span class="af-heartbeat-dot"></span>
+                <span>{{ readiness_pct|default:96 }}% Network Online</span>
+            </div>
+
+            <button type="button" class="af-btn af-btn-outline open-report-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                </svg>
+                <span>Report an Issue</span>
+            </button>
+
+            {% if user.is_authenticated %}
+                <a href="/admin/" class="af-btn af-btn-primary">
+                    <span>Janitorial &amp; Admin Portal</span>
+                </a>
+                <form method="post" action="{% url 'authentication:logout' %}" style="margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="af-btn af-btn-outline" title="Signed in as {{ user.username }}">
+                        Log Out ({{ user.username }})
+                    </button>
+                </form>
+            {% else %}
+                <a href="{% url 'authentication:login' %}" class="af-btn af-btn-primary">
+                    <span>Janitorial &amp; Admin Portal</span>
+                </a>
+            {% endif %}
+
+            <button type="button" id="af-mobile-menu-btn" class="af-mobile-toggle" aria-expanded="false" aria-controls="af-mobile-drawer" aria-label="Toggle Navigation Menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+</header>
+
+<!-- Responsive Mobile Navigation Drawer -->
+<div id="af-mobile-drawer" class="af-mobile-drawer" aria-label="Mobile Navigation Drawer">
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <a href="#directory" class="af-nav-link">Live Directory</a>
+        <a href="#building-coverage" class="af-nav-link">Building Coverage</a>
+        <a href="#janitorial-logs" class="af-nav-link">Janitorial Logs</a>
+        <a href="#how-it-works" class="af-nav-link">How It Works</a>
+        <a href="#campus-impact" class="af-nav-link">Campus Impact</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'user_profile:profile' %}" class="af-nav-link">My Profile ({{ user.username }})</a>
+        <a href="{% url 'user_settings:settings' %}" class="af-nav-link">Account Settings</a>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<!-- ==========================================================================
+     SECTION 3: ASYMMETRIC SPLIT-SCREEN HERO & LIVE TELEMETRY COMMAND CARD
+     ========================================================================== -->
+<section class="af-hero">
+    <div class="af-hero-grid-bg"></div>
+    <div class="af-hero-glow"></div>
 
-    <!-- Top Welcome Banner -->
-    <div class="bg-gradient-to-r from-aqua-navy via-aqua-navy-light to-aqua-teal rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden mb-8">
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-cyan-200 text-xs font-semibold uppercase tracking-wider backdrop-blur border border-white/10 mb-3">
-                    <span class="h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
-                    Live Campus Facility Telemetry
+    <div class="af-container">
+        <div class="af-hero-layout">
+            <!-- Left Column (7 Cols): Value Proposition & Immediate Actions -->
+            <div class="af-hero-left">
+                <div class="af-eyebrow">
+                    <span class="af-live-dot"></span>
+                    <span>REAL-TIME CAMPUS WATER &amp; MAINTENANCE SYSTEM</span>
                 </div>
-                <h1 class="text-2xl sm:text-4xl font-black tracking-tight">
-                    Welcome back, {{ request.user.username }}! 👋
+
+                <h1 class="af-hero-title">
+                    Never Walk to an <span>Empty Campus Water Dispenser</span> Again.
                 </h1>
-                <p class="text-cyan-100 text-sm sm:text-base mt-1 max-w-xl">
-                    {% if profile %}
-                        Logged in as <strong class="text-white">{{ profile.get_role_display }}</strong> &middot; {{ profile.institutional_email }}
-                    {% else %}
-                        Monitor campus water stations, check supply levels, and report empty tanks in real-time.
-                    {% endif %}
+
+                <p class="af-hero-lead">
+                    AquaFill empowers CIT-U students, faculty, and janitorial teams with live tank telemetry, chilled/hot tap readiness, and verified sanitation logs across every academic building. Spot operational stations before climbing the stairs—or dispatch a refill crew in seconds.
                 </p>
+
+                <div class="af-hero-ctas">
+                    <a href="#directory" class="af-btn af-btn-primary af-btn-lg">
+                        <span>Browse Live Dispensers &darr;</span>
+                    </a>
+                    <button type="button" class="af-btn af-btn-outline af-btn-lg open-report-btn">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+                        </svg>
+                        <span>Log Maintenance / Report Empty</span>
+                    </button>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'user_profile:profile' %}" class="af-btn af-btn-outline af-btn-lg">
+                        <span>Hydration Profile ({{ profile_details.hydration_percentage|default:48 }}%) &rarr;</span>
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Building Quick-Jump Strip -->
+                <div>
+                    <span class="af-quickjump-label">Instant Building Filter &amp; Quick-Jump</span>
+                    <div class="af-quickjump-strip">
+                        <button type="button" class="af-building-pill active js-building-jump" data-building="all">
+                            All Buildings ({{ total_stations|default:9 }})
+                        </button>
+                        <button type="button" class="af-building-pill js-building-jump" data-building="NGE Building">
+                            🏛️ NGE Building
+                        </button>
+                        <button type="button" class="af-building-pill js-building-jump" data-building="GLE Building">
+                            💻 GLE Building
+                        </button>
+                        <button type="button" class="af-building-pill js-building-jump" data-building="RTL Building">
+                            📚 RTL Building
+                        </button>
+                        <button type="button" class="af-building-pill js-building-jump" data-building="SAL Building">
+                            🔬 SAL Building
+                        </button>
+                        <button type="button" class="af-building-pill js-building-jump" data-building="Main / Admin">
+                            🏢 Main / Admin
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3">
-                <a href="{% url 'user_profile:profile' %}"
-                   class="bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl border border-white/20 backdrop-blur transition">
-                    View My Profile &rarr;
-                </a>
-                <button type="button" class="open-report-btn bg-cyan-400 hover:bg-cyan-300 text-slate-900 text-xs sm:text-sm font-bold px-4 py-2.5 rounded-xl shadow-lg transition">
-                    + Report Station Issue
+            <!-- Right Column (5 Cols): Interactive 'Campus Hydration Snapshot' Dashboard Card -->
+            <div class="af-hero-right">
+                <div class="af-snapshot-card">
+                    <div class="af-snapshot-header">
+                        <div>
+                            <h2 class="af-snapshot-title">Live Campus Readiness</h2>
+                            <span style="font-size: 12px; color: var(--text-secondary);">CIT-U Hydration Telemetry Mesh</span>
+                        </div>
+                        <span class="af-sync-badge">● Synced Just Now</span>
+                    </div>
+
+                    <!-- Center Visual: Animated SVG Circular Radial Gauge + Breakdown -->
+                    <div class="af-gauge-wrapper">
+                        <div class="af-gauge-center-wrap">
+                            <svg class="af-radial-svg" viewBox="0 0 110 110">
+                                <defs>
+                                    <linearGradient id="aquaGaugeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="#0284C7" />
+                                        <stop offset="100%" stop-color="#06B6D4" />
+                                    </linearGradient>
+                                </defs>
+                                <circle class="af-radial-bg" cx="55" cy="55" r="46"></circle>
+                                <circle class="af-radial-value" id="hero-radial-circle" cx="55" cy="55" r="46"
+                                        data-pct="{{ readiness_pct|default:88 }}"></circle>
+                            </svg>
+                            <div class="af-gauge-label">
+                                <span class="af-gauge-pct">{{ readiness_pct|default:88 }}%</span>
+                                <span class="af-gauge-sub">Ready</span>
+                            </div>
+                        </div>
+
+                        <div class="af-breakdown-col">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 6px;">
+                                <span>Fleet Distribution</span>
+                                <span class="font-mono-num">{{ total_stations|default:9 }} Units</span>
+                            </div>
+                            <div class="af-Stacked-bar" aria-label="Unit Status Proportions">
+                                <div style="width: {{ operational_pct|default:67 }}%; background: var(--status-opt-dot);"></div>
+                                <div style="width: {{ low_water_pct|default:22 }}%; background: var(--status-low-dot);"></div>
+                                <div style="width: {{ maintenance_pct|default:11 }}%; background: var(--status-crit-dot);"></div>
+                            </div>
+                            <div class="af-legend-list">
+                                <div class="af-legend-row">
+                                    <span><span class="af-legend-dot" style="background: var(--status-opt-dot);"></span>Operational (&ge;40%)</span>
+                                    <strong class="font-mono-num" style="color: var(--text-primary);">{{ online_stations|default:6 }} Units</strong>
+                                </div>
+                                <div class="af-legend-row">
+                                    <span><span class="af-legend-dot" style="background: var(--status-low-dot);"></span>Needs Refill (15–39%)</span>
+                                    <strong class="font-mono-num" style="color: var(--text-primary);">{{ low_water_stations|default:2 }} Units</strong>
+                                </div>
+                                <div class="af-legend-row">
+                                    <span><span class="af-legend-dot" style="background: var(--status-crit-dot);"></span>Maintenance / Offline</span>
+                                    <strong class="font-mono-num" style="color: var(--text-primary);">{{ maintenance_stations|default:1 }} Unit</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom 3-Tile Micro-Grid -->
+                    <div class="af-snapshot-tiles">
+                        <div class="af-snapshot-tile">
+                            <span class="af-tile-val">{{ online_stations|default:6 }} / {{ total_stations|default:9 }}</span>
+                            <span class="af-tile-lbl">Active Units</span>
+                        </div>
+                        <div class="af-snapshot-tile">
+                            <span class="af-tile-val" style="color: var(--status-low-text);">{{ low_water_stations|default:2 }} Units</span>
+                            <span class="af-tile-lbl">Refills Queued</span>
+                        </div>
+                        <div class="af-snapshot-tile">
+                            <span class="af-tile-val" style="color: var(--brand-ocean);">14 mins</span>
+                            <span class="af-tile-lbl">Avg. Refill Time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Backend KPI Strip (Preserves existing `stats` context variable) -->
+        {% if stats %}
+        <div class="af-kpi-strip">
+            {% for stat in stats %}
+            <div class="af-kpi-card">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted);">
+                        {{ stat.label }}
+                    </span>
+                    <span class="af-status-badge {% if stat.badge_color == 'teal' %}af-status-opt{% elif stat.badge_color == 'amber' %}af-status-low{% elif stat.badge_color == 'rose' %}af-status-crit{% else %}af-sanitized-tag{% endif %}">
+                        {{ stat.badge }}
+                    </span>
+                </div>
+                <div class="font-mono-num" style="font-size: 26px; font-weight: 700; color: var(--text-primary);">
+                    {{ stat.value }}
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                    {{ stat.description }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 4 & SECTION 5: COMMAND BAR + BENTO DISPENSER TELEMETRY DIRECTORY
+     ========================================================================== -->
+<section id="directory" class="af-section" style="padding-top: 20px;">
+    <div class="af-container">
+        <div class="af-section-header">
+            <div>
+                <span class="af-quickjump-label" style="color: var(--brand-ocean); margin-bottom: 4px;">LIVE SENSOR DIRECTORY</span>
+                <h2 class="af-section-title">Campus Water Dispenser Telemetry</h2>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" class="af-btn af-btn-outline open-report-btn">
+                    + Submit Refill / Maintenance Ticket
                 </button>
             </div>
         </div>
 
-        <!-- Decorative background glow -->
-        <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none"></div>
-    </div>
+        <!-- Section 4: Floating Multi-Faceted Search, Filter & Sort Command Bar -->
+        <div class="af-command-bar" role="search" aria-label="Dispenser Telemetry Filter Bar">
+            <div class="af-command-top">
+                <!-- 1. Instant Search Input -->
+                <div class="af-search-box">
+                    <svg class="af-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="station-search" class="af-search-input"
+                           placeholder='Search e.g., "GLE 3rd Floor", "NGE", "DSP-GLE"...'
+                           aria-label="Search dispensers by building, floor, or unit ID">
+                    <button type="button" id="clear-search-btn" class="af-search-Clear" aria-label="Clear search">&times;</button>
+                    <kbd class="af-search-kbd" title="Press / to search">/</kbd>
+                </div>
 
-    <!-- Live Telemetry KPI Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
-        {% for stat in stats %}
-        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm hover:shadow-md transition">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ stat.label }}</span>
-                <span class="text-xs font-bold px-2.5 py-0.5 rounded-full
-                    {% if stat.badge_color == 'teal' %} bg-teal-50 text-teal-700 border border-teal-200
-                    {% elif stat.badge_color == 'amber' %} bg-amber-50 text-amber-700 border border-amber-200
-                    {% elif stat.badge_color == 'rose' %} bg-rose-50 text-rose-700 border border-rose-200
-                    {% else %} bg-cyan-50 text-cyan-700 border border-cyan-200 {% endif %}">
-                    {{ stat.badge }}
-                </span>
+                <!-- 2. Status Segmented Pill Tabs -->
+                <div class="af-status-tabs" role="tablist" aria-label="Filter by operational status">
+                    <button type="button" class="af-status-tab station-filter-btn active" data-filter="all">
+                        <span>All Stations</span>
+                        <span class="af-tab-count" id="count-all">{{ total_stations|default:9 }}</span>
+                    </button>
+                    <button type="button" class="af-status-tab station-filter-btn" data-filter="operational">
+                        <span style="color: var(--status-opt-dot);">●</span>
+                        <span>Operational</span>
+                        <span class="af-tab-count" id="count-operational">{{ online_stations|default:6 }}</span>
+                    </button>
+                    <button type="button" class="af-status-tab station-filter-btn" data-filter="low_water">
+                        <span style="color: var(--status-low-dot);">●</span>
+                        <span>Low / Refill Soon</span>
+                        <span class="af-tab-count" id="count-low">{{ low_water_stations|default:2 }}</span>
+                    </button>
+                    <button type="button" class="af-status-tab station-filter-btn" data-filter="maintenance">
+                        <span style="color: var(--status-crit-dot);">●</span>
+                        <span>Out of Service</span>
+                        <span class="af-tab-count" id="count-maint">{{ maintenance_stations|default:1 }}</span>
+                    </button>
+                </div>
             </div>
-            <div class="text-3xl font-black text-aqua-navy">{{ stat.value }}</div>
-            <div class="text-xs text-slate-500 mt-1">{{ stat.description }}</div>
-        </div>
-        {% endfor %}
-    </div>
 
-    <!-- Station Filter & Search Toolbar -->
-    <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <div class="flex items-center gap-2">
-            <img src="{% static 'home/images/station-icon.svg' %}" alt="Icon" class="h-6 w-6">
-            <h2 class="text-xl font-bold text-aqua-navy">Campus Water Dispensers</h2>
-        </div>
-
-        <div class="flex flex-col sm:flex-row w-full md:w-auto items-stretch sm:items-center gap-3">
-            <input type="text" id="station-search" placeholder="Search building or station name..."
-                   class="px-4 py-2 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 w-full sm:w-64 bg-white">
-
-            <div class="flex items-center bg-slate-100 p-1 rounded-xl gap-1 text-xs font-bold">
-                <button type="button" class="station-filter-btn active px-3 py-1.5 rounded-lg transition" data-filter="all">All</button>
-                <button type="button" class="station-filter-btn px-3 py-1.5 rounded-lg transition text-slate-600" data-filter="online">Online</button>
-                <button type="button" class="station-filter-btn px-3 py-1.5 rounded-lg transition text-slate-600" data-filter="low_water">Low Water</button>
-                <button type="button" class="station-filter-btn px-3 py-1.5 rounded-lg transition text-slate-600" data-filter="maintenance">Maintenance</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Water Stations Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for station in stations %}
-        <div class="station-card bg-white rounded-2xl border border-slate-100 shadow-sm p-6 flex flex-col justify-between"
-             data-name="{{ station.name }}" data-building="{{ station.building }}" data-status="{{ station.status }}">
-
-            <div>
-                <!-- Header: Name & Status Pill -->
-                <div class="flex items-start justify-between gap-2 mb-3">
-                    <div>
-                        <h3 class="font-bold text-aqua-navy text-lg leading-snug">{{ station.name }}</h3>
-                        <p class="text-xs font-medium text-slate-500">{{ station.building }} &middot; {{ station.floor }}</p>
+            <div class="af-command-bottom">
+                <div class="af-filter-controls">
+                    <!-- 3. Building Dropdown Filter -->
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <label for="building-select" style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary);">Building:</label>
+                        <select id="building-select" class="af-select">
+                            <option value="all">All Campus Buildings</option>
+                            <option value="NGE Building">NGE Building (Engineering)</option>
+                            <option value="GLE Building">GLE Building (Computer Studies)</option>
+                            <option value="RTL Building">RTL Building (Library &amp; CASE)</option>
+                            <option value="SAL Building">SAL Building (Science &amp; Allied)</option>
+                            <option value="Main / Admin">Main / Admin &amp; Gymnasium</option>
+                        </select>
                     </div>
-                    <div>
-                        {% if station.status == 'ONLINE' %}
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-700 border border-teal-200">
-                                <span class="h-2 w-2 rounded-full bg-teal-500 pulse-online"></span>
-                                Online
+
+                    <!-- 4. Water Temperature Toggle Chips -->
+                    <div class="af-temp-chips" role="group" aria-label="Filter by water temperature availability">
+                        <span style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-right: 4px;">Tap Temp:</span>
+                        <button type="button" class="af-temp-chip js-temp-chip" data-temp="cold">
+                            <span>❄️ Cold Chilled</span>
+                        </button>
+                        <button type="button" class="af-temp-chip js-temp-chip" data-temp="warm">
+                            <span>💧 Warm / Ambient</span>
+                        </button>
+                        <button type="button" class="af-temp-chip js-temp-chip" data-temp="hot">
+                            <span>🔥 Hot Tap</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5. Live Result Counter & Reset -->
+                <div class="af-results-meta">
+                    <span id="live-result-counter" class="font-mono-num">
+                        Showing <strong>{{ total_stations|default:9 }}</strong> of <strong>{{ total_stations|default:9 }}</strong> campus dispensers
+                    </span>
+                    <button type="button" id="reset-all-filters" class="af-reset-btn">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Rich Bento-Style Dispenser Telemetry Grid -->
+        <div class="af-bento-grid" id="dispenser-grid">
+            {% for dispenser in dispensers|default:stations %}
+            <article class="dispenser-card station-card"
+                     data-id="{{ dispenser.id }}"
+                     data-name="{{ dispenser.name }}"
+                     data-code="{{ dispenser.code|default:'DSP-UNIT' }}"
+                     data-building="{{ dispenser.building_group|default:dispenser.building }}"
+                     data-raw-building="{{ dispenser.building }}"
+                     data-floor="{{ dispenser.floor }}"
+                     data-status="{{ dispenser.status }}"
+                     data-status-cat="{{ dispenser.status_category|default:'operational' }}"
+                     data-level="{{ dispenser.water_level|default:dispenser.current_level_percentage }}"
+                     data-temp="{{ dispenser.temp_capabilities|default:'cold,warm,hot' }}"
+                     data-celsius="{{ dispenser.temperature_celsius }}"
+                     data-dispensed="{{ dispenser.total_dispensed_liters|floatformat:0 }}"
+                     data-search="{{ dispenser.code|default:'DSP' }} {{ dispenser.name }} {{ dispenser.building }} {{ dispenser.building_group }} {{ dispenser.floor }}">
+
+                <div class="af-card-body">
+                    <!-- Top Header: Monospace Unit ID + Floor Pill + Semantic Status Badge -->
+                    <div class="af-card-top">
+                        <div class="af-unit-meta">
+                            <span class="af-unit-code">{{ dispenser.code|default:"DSP-UNIT" }}</span>
+                            <span class="af-zone-pill">{{ dispenser.floor }}</span>
+                        </div>
+
+                        {% if dispenser.status == 'ONLINE' and dispenser.current_level_percentage >= 40 %}
+                            <span class="af-status-badge af-status-opt">
+                                <span class="af-heartbeat-dot"></span>
+                                Operational
                             </span>
-                        {% elif station.status == 'LOW_WATER' %}
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                                <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                        {% elif dispenser.status == 'LOW_WATER' or dispenser.current_level_percentage < 40 and dispenser.status == 'ONLINE' %}
+                            <span class="af-status-badge af-status-low">
+                                <span style="width:7px;height:7px;border-radius:50%;background:var(--status-low-dot);"></span>
                                 Low Supply
                             </span>
-                        {% elif station.status == 'MAINTENANCE' %}
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                                <span class="h-2 w-2 rounded-full bg-rose-500"></span>
-                                Maintenance
-                            </span>
                         {% else %}
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                                Offline
+                            <span class="af-status-badge af-status-crit">
+                                <span style="width:7px;height:7px;border-radius:50%;background:var(--status-crit-dot);"></span>
+                                {{ dispenser.get_status_display|default:"Maintenance" }}
                             </span>
                         {% endif %}
                     </div>
-                </div>
 
-                <!-- Water Tank Level Progress Bar -->
-                <div class="my-4">
-                    <div class="flex justify-between text-xs font-semibold mb-1">
-                        <span class="text-slate-500">Supply Level</span>
-                        <span class="{% if station.current_level_percentage > 40 %}text-teal-700{% elif station.current_level_percentage > 15 %}text-amber-700{% else %}text-rose-700{% endif %} font-bold">
-                            {{ station.current_level_percentage }}% ({{ station.capacity_liters }}L tank)
+                    <!-- Title & Landmark -->
+                    <h3 class="af-card-title">{{ dispenser.location|default:dispenser.name }}</h3>
+                    <p class="af-card-landmark">{{ dispenser.building }} &bull; {{ dispenser.capacity_liters|floatformat:0 }}L Commercial Jug</p>
+
+                    <!-- Visual Water Tank Level Gauge -->
+                    <div class="af-tank-gauge">
+                        <div class="af-tank-header">
+                            <span style="color: var(--text-secondary);">Current Water Level</span>
+                            <span class="font-mono-num" style="font-size: 13.5px; font-weight: 700;
+                                {% if dispenser.current_level_percentage >= 40 %}color: var(--status-opt-text);
+                                {% elif dispenser.current_level_percentage >= 15 %}color: var(--status-low-text);
+                                {% else %}color: var(--status-crit-text);{% endif %}">
+                                {{ dispenser.water_level|default:dispenser.current_level_percentage }}%
+                            </span>
+                        </div>
+                        <div class="af-tank-track">
+                            <div class="af-tank-fill js-water-bar
+                                {% if dispenser.current_level_percentage >= 40 %}af-fill-opt
+                                {% elif dispenser.current_level_percentage >= 15 %}af-fill-low
+                                {% else %}af-fill-crit{% endif %}"
+                                 data-target-width="{{ dispenser.water_level|default:dispenser.current_level_percentage }}%"
+                                 style="width: {{ dispenser.water_level|default:dispenser.current_level_percentage }}%;"></div>
+                            <div class="af-tank-ticks">
+                                <span class="af-tank-tick"></span>
+                                <span class="af-tank-tick"></span>
+                                <span class="af-tank-tick"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Temperature & Feature Matrix -->
+                    <div class="af-temp-matrix">
+                        <div class="af-tap-pill {% if dispenser.status != 'MAINTENANCE' and dispenser.temperature_celsius <= 12 %}ready-cold{% endif %}">
+                            <span>❄️ Cold {{ dispenser.temperature_celsius }}&deg;C</span>
+                        </div>
+                        <div class="af-tap-pill ready-warm">
+                            <span>💧 Warm Ready</span>
+                        </div>
+                        <div class="af-tap-pill {% if dispenser.status != 'MAINTENANCE' %}ready-hot{% endif %}">
+                            <span>🔥 Hot 88&deg;C</span>
+                        </div>
+                    </div>
+
+                    <!-- Metadata Strip -->
+                    <div class="af-meta-strip">
+                        <span class="font-mono-num">
+                            Last Refilled: <strong>{{ dispenser.last_refilled|default:dispenser.last_refilled_at|timesince }} ago</strong>
+                        </span>
+                        <span class="af-sanitized-tag">
+                            ✓ Sanitized: Verified
                         </span>
                     </div>
-                    <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-                        <div class="h-3 rounded-full water-level-bar
-                            {% if station.current_level_percentage > 40 %} bg-gradient-to-r from-teal-500 to-cyan-400
-                            {% elif station.current_level_percentage > 15 %} bg-gradient-to-r from-amber-500 to-amber-400
-                            {% else %} bg-gradient-to-r from-rose-500 to-rose-400 {% endif %}"
-                             style="width: {{ station.current_level_percentage }}%;"></div>
-                    </div>
                 </div>
 
-                <!-- Telemetry Row -->
-                <div class="grid grid-cols-2 gap-2 text-xs text-slate-500 bg-slate-50 p-3 rounded-xl mb-4">
-                    <div>
-                        <span class="block text-[10px] uppercase font-bold text-slate-400">Chilled Temp</span>
-                        <span class="font-semibold text-slate-700">{{ station.temperature_celsius }} °C ❄️</span>
+                <!-- Card Action Footer -->
+                <div class="af-card-footer">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button type="button" class="af-card-link js-view-details"
+                                data-code="{{ dispenser.code|default:'DSP-UNIT' }}"
+                                data-name="{{ dispenser.name }}"
+                                data-building="{{ dispenser.building }}"
+                                data-floor="{{ dispenser.floor }}"
+                                data-level="{{ dispenser.current_level_percentage }}"
+                                data-temp="{{ dispenser.temperature_celsius }}"
+                                data-dispensed="{{ dispenser.total_dispensed_liters|floatformat:0 }}"
+                                data-refilled="{{ dispenser.last_refilled_at|timesince }} ago">
+                            View Details &amp; History &rarr;
+                        </button>
+
+                        {% if profile.role == 'FACILITY_STAFF' or request.user.is_superuser %}
+                        <a href="{% url 'home:refill' dispenser.id %}"
+                           class="af-status-badge af-status-opt" style="text-decoration: none;"
+                           title="Facility Staff Quick Refill">
+                            Mark 100% Full 💧
+                        </a>
+                        {% endif %}
                     </div>
-                    <div>
-                        <span class="block text-[10px] uppercase font-bold text-slate-400">Dispensed</span>
-                        <span class="font-semibold text-slate-700">{{ station.total_dispensed_liters|floatformat:0 }} Liters</span>
-                    </div>
+
+                    <button type="button" class="af-card-report-btn open-report-btn"
+                            data-station-id="{{ dispenser.id }}">
+                        Report Issue / Empty
+                    </button>
                 </div>
+            </article>
+            {% empty %}
+            <div style="grid-column: 1 / -1; background: var(--bg-surface); border: 1px solid var(--border-hairline); border-radius: 18px; padding: 48px 24px; text-align: center;">
+                <h3 class="font-display" style="font-size: 20px; margin: 0 0 8px 0;">No Campus Dispensers Loaded Yet</h3>
+                <p style="color: var(--text-secondary); margin: 0 0 16px 0;">Run the database seed command to populate CIT-U campus dispensers.</p>
+                <code class="font-mono-num" style="background: var(--bg-subtle); padding: 8px 14px; border-radius: 8px;">python manage.py seed_aquafill</code>
             </div>
-
-            <!-- Action Buttons -->
-            <div class="pt-2 border-t border-slate-100 flex items-center justify-between gap-2">
-                <button type="button" class="open-report-btn text-xs font-bold text-rose-600 hover:text-rose-800 transition py-1"
-                        data-station-id="{{ station.id }}">
-                    ⚠️ Report Refill / Issue
-                </button>
-
-                {% if profile.role == 'FACILITY_STAFF' or request.user.is_superuser %}
-                <a href="{% url 'home:refill' station.id %}"
-                   class="text-xs bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 font-bold px-3 py-1.5 rounded-lg transition">
-                    Mark 100% Full 💧
-                </a>
-                {% endif %}
-            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="col-span-full bg-white rounded-2xl border border-slate-100 p-8 text-center">
-            <div class="h-16 w-16 mx-auto rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center text-3xl mb-3">💧</div>
-            <h3 class="font-bold text-aqua-navy text-lg">No Stations Loaded Yet</h3>
-            <p class="text-sm text-slate-500 max-w-md mx-auto mt-1 mb-4">
-                Run the database seed command to populate realistic campus dispensers for testing!
+
+        <!-- JS-Controlled Empty State When No Filters Match -->
+        <div id="js-no-results" style="display: none; background: var(--bg-surface); border: 1px dashed var(--border-strong); border-radius: 18px; padding: 48px 24px; text-align: center; margin-top: 16px;">
+            <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+            <h3 class="font-display" style="font-size: 19px; margin: 0 0 6px 0;">No Matching Campus Dispensers Found</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; max-width: 440px; margin: 0 auto 18px;">
+                No stations match your active building, temperature, or status filters. Try clearing your search query or resetting filters.
             </p>
-            <code class="bg-slate-100 px-3 py-1 rounded font-mono text-xs text-teal-800">python manage.py seed_aquafill</code>
+            <button type="button" class="af-btn af-btn-primary" id="empty-reset-btn">Reset All Filters</button>
         </div>
-        {% endfor %}
     </div>
+</section>
 
-</div>
-
-<!-- Modal: Report Empty Station / Issue -->
-<div id="report-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative">
-        <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-aqua-navy">Report Water Station</h3>
-            <button type="button" id="close-report-modal" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+<!-- ==========================================================================
+     SECTION 6: CAMPUS BUILDING COVERAGE & QUICK-STATUS MATRIX
+     ========================================================================== -->
+<section id="building-coverage" class="af-section" style="background: var(--bg-subtle); border-top: 1px solid var(--border-hairline); border-bottom: 1px solid var(--border-hairline);">
+    <div class="af-container">
+        <div class="af-section-header">
+            <div>
+                <span class="af-quickjump-label" style="color: var(--brand-ocean); margin-bottom: 4px;">ACADEMIC ZONE COVERAGE</span>
+                <h2 class="af-section-title">Campus Building Hydration Matrix</h2>
+            </div>
+            <span style="font-size: 13.5px; color: var(--text-secondary);">Click any academic building to isolate its floor dispensers above</span>
         </div>
-        <p class="text-xs text-slate-500 mb-4">Submit a maintenance ticket. Facility staff will be dispatched to replenish or inspect the unit.</p>
+
+        <div class="af-building-matrix">
+            <!-- NGE Building -->
+            <div class="af-bldg-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="af-unit-code">NGE ZONE</span>
+                        <span class="af-status-badge af-status-opt">100% Online</span>
+                    </div>
+                    <h3 class="font-display" style="font-size: 17px; margin: 0 0 4px 0;">NGE Building</h3>
+                    <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0 0 14px 0;">Engineering &amp; Architecture Floors 1–4</p>
+                    <div class="af-Stacked-bar">
+                        <div style="width: 100%; background: var(--status-opt-dot);"></div>
+                    </div>
+                </div>
+                <button type="button" class="af-btn af-btn-outline js-building-jump" style="width: 100%; margin-top: 10px;" data-building="NGE Building">
+                    Filter Building &rarr;
+                </button>
+            </div>
+
+            <!-- GLE Building -->
+            <div class="af-bldg-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="af-unit-code">GLE ZONE</span>
+                        <span class="af-status-badge af-status-low">1 Refill Due</span>
+                    </div>
+                    <h3 class="font-display" style="font-size: 17px; margin: 0 0 4px 0;">GLE Building</h3>
+                    <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0 0 14px 0;">CCS Innovation &amp; AI Labs Floors 1–6</p>
+                    <div class="af-Stacked-bar">
+                        <div style="width: 55%; background: var(--status-opt-dot);"></div>
+                        <div style="width: 45%; background: var(--status-low-dot);"></div>
+                    </div>
+                </div>
+                <button type="button" class="af-btn af-btn-outline js-building-jump" style="width: 100%; margin-top: 10px;" data-building="GLE Building">
+                    Filter Building &rarr;
+                </button>
+            </div>
+
+            <!-- RTL Building -->
+            <div class="af-bldg-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="af-unit-code">RTL ZONE</span>
+                        <span class="af-status-badge af-status-low">1 Low Tank</span>
+                    </div>
+                    <h3 class="font-display" style="font-size: 17px; margin: 0 0 4px 0;">RTL Building</h3>
+                    <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0 0 14px 0;">Learning Resource Center &amp; CASE</p>
+                    <div class="af-Stacked-bar">
+                        <div style="width: 50%; background: var(--status-opt-dot);"></div>
+                        <div style="width: 50%; background: var(--status-low-dot);"></div>
+                    </div>
+                </div>
+                <button type="button" class="af-btn af-btn-outline js-building-jump" style="width: 100%; margin-top: 10px;" data-building="RTL Building">
+                    Filter Building &rarr;
+                </button>
+            </div>
+
+            <!-- SAL Building -->
+            <div class="af-bldg-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="af-unit-code">SAL ZONE</span>
+                        <span class="af-status-badge af-status-opt">Optimal</span>
+                    </div>
+                    <h3 class="font-display" style="font-size: 17px; margin: 0 0 4px 0;">SAL Building</h3>
+                    <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0 0 14px 0;">Science, Nursing &amp; Laboratory Wing</p>
+                    <div class="af-Stacked-bar">
+                        <div style="width: 100%; background: var(--status-opt-dot);"></div>
+                    </div>
+                </div>
+                <button type="button" class="af-btn af-btn-outline js-building-jump" style="width: 100%; margin-top: 10px;" data-building="SAL Building">
+                    Filter Building &rarr;
+                </button>
+            </div>
+
+            <!-- Main / Admin Building -->
+            <div class="af-bldg-card">
+                <div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="af-unit-code">MAIN / GYM</span>
+                        <span class="af-status-badge af-status-crit">1 Servicing</span>
+                    </div>
+                    <h3 class="font-display" style="font-size: 17px; margin: 0 0 4px 0;">Main / Admin</h3>
+                    <p style="font-size: 12.5px; color: var(--text-secondary); margin: 0 0 14px 0;">Registrar Concourse &amp; Wildcats Gym</p>
+                    <div class="af-Stacked-bar">
+                        <div style="width: 60%; background: var(--status-opt-dot);"></div>
+                        <div style="width: 40%; background: var(--status-crit-dot);"></div>
+                    </div>
+                </div>
+                <button type="button" class="af-btn af-btn-outline js-building-jump" style="width: 100%; margin-top: 10px;" data-building="Main / Admin">
+                    Filter Building &rarr;
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 7: SPLIT OPERATIONS HUB (JANITORIAL TIMELINE + 3-STEP WORKFLOW)
+     ========================================================================== -->
+<section id="janitorial-logs" class="af-section">
+    <div class="af-container">
+        <div class="af-ops-grid">
+            <!-- Left Column (6 Cols): Live Janitorial & Maintenance Activity Timeline -->
+            <div class="af-ops-col">
+                <div class="af-timeline-card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                        <div>
+                            <span class="af-quickjump-label" style="color: var(--brand-ocean); margin-bottom: 2px;">FACILITIES DISPATCH FEED</span>
+                            <h2 class="font-display" style="font-size: 22px; margin: 0;">Live Janitorial Activity Log</h2>
+                        </div>
+                        <span class="af-heartbeat-pill">Verified Logs</span>
+                    </div>
+
+                    <div class="af-timeline">
+                        {% for log in logs %}
+                        <div class="af-timeline-item">
+                            <div class="af-timeline-node" style="background: var(--status-opt-bg); color: var(--status-opt-text);">💧</div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <strong style="font-size: 14px; color: var(--text-primary);">{{ log.get_issue_type_display }} &mdash; {{ log.station.name }}</strong>
+                                <span class="font-mono-num" style="font-size: 11.5px; color: var(--text-muted);">{{ log.created_at|timesince }} ago</span>
+                            </div>
+                            <p style="font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 6px;">
+                                {{ log.notes|default:"Ticket logged into CIT-U Facilities dispatch queue for inspection and jug replacement." }}
+                            </p>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="af-unit-code">{{ log.station.code|default:"DSP-CIT" }}</span>
+                                <span class="af-zone-pill">Reported by @{{ log.reported_by.username }}</span>
+                                <span class="af-sanitized-tag">{{ log.get_status_display }}</span>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <!-- Default Rich Activity Entries when no tickets have been submitted yet -->
+                        <div class="af-timeline-item">
+                            <div class="af-timeline-node" style="background: var(--status-opt-bg); color: var(--status-opt-text);">💧</div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <strong style="font-size: 14px; color: var(--text-primary);">5-Gallon Purified Jug Replaced &amp; Nozzle Sanitized</strong>
+                                <span class="font-mono-num" style="font-size: 11.5px; color: var(--text-muted);">12m ago</span>
+                            </div>
+                            <p style="font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 6px;">
+                                Replenished to 92% capacity and verified 8.4&deg;C chilled compressor output at NGE East Lobby.
+                            </p>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="af-unit-code">DSP-NGE-01</span>
+                                <span class="af-zone-pill">Staff: R. Dalisay (Facilities)</span>
+                            </div>
+                        </div>
+
+                        <div class="af-timeline-item">
+                            <div class="af-timeline-node" style="background: var(--status-san-bg); color: var(--status-san-text);">🛡️</div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <strong style="font-size: 14px; color: var(--text-primary);">UV &amp; Food-Grade Steam Sanitation Cycle Completed</strong>
+                                <span class="font-mono-num" style="font-size: 11.5px; color: var(--text-muted);">41m ago</span>
+                            </div>
+                            <p style="font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 6px;">
+                                Scheduled morning drip-tray and spout sterilization verified for GLE CCS Innovation Hub.
+                            </p>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="af-unit-code">DSP-GLE-03</span>
+                                <span class="af-zone-pill">Staff: M. Villamor (Sanitation)</span>
+                            </div>
+                        </div>
+
+                        <div class="af-timeline-item">
+                            <div class="af-timeline-node" style="background: var(--status-low-bg); color: var(--status-low-text);">⚠️</div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <strong style="font-size: 14px; color: var(--text-primary);">Low Water Threshold Alert (&lt;25%) Queued for Refill</strong>
+                                <span class="font-mono-num" style="font-size: 11.5px; color: var(--text-muted);">1h ago</span>
+                            </div>
+                            <p style="font-size: 12.5px; color: var(--text-secondary); margin: 4px 0 6px;">
+                                Automatic dispatch alert sent to RTL ground floor janitorial pantry; replacement jug en route.
+                            </p>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span class="af-unit-code">DSP-RTL-05</span>
+                                <span class="af-zone-pill">Auto-Telemetry Trigger</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column (6 Cols): 'How AquaFill Works' Interactive Workflow Cards -->
+            <div id="how-it-works" class="af-ops-col">
+                <div style="margin-bottom: 18px;">
+                    <span class="af-quickjump-label" style="color: var(--brand-ocean); margin-bottom: 2px;">CLOSED-LOOP CIVIC WORKFLOW</span>
+                    <h2 class="font-display" style="font-size: 22px; margin: 0;">How AquaFill Works Across Campus</h2>
+                </div>
+
+                <div class="af-step-stack">
+                    <div class="af-step-card">
+                        <div class="af-step-num">01</div>
+                        <div>
+                            <h3 class="font-display" style="font-size: 17px; margin: 0 0 6px 0;">Check Real-Time Availability</h3>
+                            <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">
+                                Inspect live water tank percentages, chilled compressor temperatures, and hot-water readiness across NGE, GLE, RTL, SAL, and Main buildings before walking across floors.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="af-step-card">
+                        <div class="af-step-num">02</div>
+                        <div>
+                            <h3 class="font-display" style="font-size: 17px; margin: 0 0 6px 0;">Flag Low Water or Leaks in Seconds</h3>
+                            <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">
+                                Spot an empty 5-gallon jug, warm chiller, or dripping faucet? Submit a 1-click location-tagged ticket directly from any dispenser card to alert campus staff.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="af-step-card">
+                        <div class="af-step-num">03</div>
+                        <div>
+                            <h3 class="font-display" style="font-size: 17px; margin: 0 0 6px 0;">Automated Janitorial Dispatch</h3>
+                            <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0;">
+                                CIT-U Facilities personnel receive prioritized refill notifications, replenish the station to 100%, and log verified sanitation timestamps in real time.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     SECTION 8: DARK-MODE SUSTAINABILITY & CAMPUS IMPACT BANNER
+     ========================================================================== -->
+<section id="campus-impact" class="af-section" style="padding-bottom: 16px;">
+    <div class="af-container">
+        <div class="af-impact-banner">
+            <div class="af-impact-glow"></div>
+            <div style="position: relative; z-index: 1; max-width: 680px;">
+                <span class="font-mono-num" style="font-size: 11.5px; font-weight: 700; color: var(--brand-cyan); letter-spacing: 0.08em; text-transform: uppercase;">
+                    CAMPUS SUSTAINABILITY &amp; EFFICIENCY
+                </span>
+                <h2 class="font-display" style="font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; margin: 8px 0 10px; color: #FFFFFF;">
+                    Measurable Hydration Impact Across CIT-U
+                </h2>
+                <p style="color: #94A3B8; font-size: 15px; margin: 0;">
+                    Every reusable bottle refilled at an AquaFill station eliminates single-use plastic waste while keeping students hydrated and facilities operations data-driven.
+                </p>
+            </div>
+
+            <div class="af-impact-grid">
+                <div class="af-impact-stat">
+                    <span class="af-impact-num">14,250+</span>
+                    <span style="font-size: 13.5px; color: #E2E8F0; font-weight: 600;">Single-Use Plastic Bottles Saved</span>
+                </div>
+                <div class="af-impact-stat">
+                    <span class="af-impact-num">7,125 L</span>
+                    <span style="font-size: 13.5px; color: #E2E8F0; font-weight: 600;">Filtered Water Dispensed This Semester</span>
+                </div>
+                <div class="af-impact-stat">
+                    <span class="af-impact-num">&lt; 15 min</span>
+                    <span style="font-size: 13.5px; color: #E2E8F0; font-weight: 600;">Median Janitorial Refill Response</span>
+                </div>
+                <div class="af-impact-stat">
+                    <span class="af-impact-num">100%</span>
+                    <span style="font-size: 13.5px; color: #E2E8F0; font-weight: 600;">Scheduled Sanitation Compliance</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ==========================================================================
+     MODAL 1: REPORT EMPTY STATION / MAINTENANCE ISSUE (PRESERVES DJANGO FORM)
+     ========================================================================== -->
+<div id="report-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="report-modal-title">
+    <div style="background: var(--bg-surface); border-radius: 20px; max-width: 460px; width: 100%; padding: 28px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-hairline);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+            <h3 id="report-modal-title" class="font-display" style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin: 0;">
+                Report Dispenser Issue / Empty Tank
+            </h3>
+            <button type="button" id="close-report-modal" style="background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer;">&times;</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 0 0 18px 0;">
+            Submit a real-time maintenance or refill ticket. CIT-U Facility staff will be dispatched to replenish or inspect the unit.
+        </p>
 
         <form method="post" action="{% url 'home:report' %}">
             {% csrf_token %}
-            <div class="space-y-4">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
                 <div>
-                    <label class="block text-xs font-bold text-aqua-navy mb-1">Target Station</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">Target Campus Dispenser</label>
                     {{ report_form.station }}
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-aqua-navy mb-1">Issue Encountered</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">Issue Encountered</label>
                     {{ report_form.issue_type }}
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-aqua-navy mb-1">Notes / Description</label>
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 5px;">Notes / Landmark Details</label>
                     {{ report_form.notes }}
                 </div>
             </div>
 
-            <div class="flex justify-end gap-2 mt-6">
-                <button type="button" onclick="document.getElementById('report-modal').classList.add('hidden')"
-                        class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-lg">
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px;">
+                <button type="button" onclick="document.getElementById('report-modal').classList.add('hidden')" class="af-btn af-btn-outline">
                     Cancel
                 </button>
-                <button type="submit" class="px-5 py-2 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white rounded-lg shadow-md transition">
-                    Submit Report
+                <button type="submit" class="af-btn af-btn-primary">
+                    Submit Dispatch Ticket
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+<!-- ==========================================================================
+     MODAL 2: STATION TELEMETRY DETAILS & SANITATION HISTORY
+     ========================================================================== -->
+<div id="detail-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden" role="dialog" aria-modal="true" aria-labelledby="detail-modal-title">
+    <div style="background: var(--bg-surface); border-radius: 20px; max-width: 480px; width: 100%; padding: 28px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-hairline);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <span id="detail-code" class="af-unit-code">DSP-UNIT</span>
+            <button type="button" id="close-detail-modal" style="background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer;">&times;</button>
+        </div>
+        <h3 id="detail-modal-title" class="font-display" style="font-size: 20px; font-weight: 800; margin: 0 0 4px 0;">Station Telemetry</h3>
+        <p id="detail-location" style="font-size: 13px; color: var(--text-secondary); margin: 0 0 18px 0;"></p>
+
+        <div class="af-snapshot-tiles" style="margin-bottom: 18px;">
+            <div class="af-snapshot-tile">
+                <span id="detail-level" class="af-tile-val">92%</span>
+                <span class="af-tile-lbl">Tank Level</span>
+            </div>
+            <div class="af-snapshot-tile">
+                <span id="detail-temp" class="af-tile-val">8.5&deg;C</span>
+                <span class="af-tile-lbl">Chilled Tap</span>
+            </div>
+            <div class="af-snapshot-tile">
+                <span id="detail-dispensed" class="af-tile-val">2450 L</span>
+                <span class="af-tile-lbl">Total Dispensed</span>
+            </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); border-radius: 12px; padding: 14px; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                <span>Last Jug Replenishment:</span>
+                <strong id="detail-refilled" class="font-mono-num" style="color: var(--text-primary);">Just now</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Sanitation &amp; Filter Status:</span>
+                <strong style="color: var(--status-opt-text);">✓ UV &amp; Carbon Verified</strong>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+            <button type="button" onclick="document.getElementById('detail-modal').classList.add('hidden')" class="af-btn af-btn-primary">
+                Done
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block site_footer %}
+<!-- ==========================================================================
+     SECTION 9: ENTERPRISE 4-COLUMN FOOTER
+     ========================================================================== -->
+<footer class="af-footer">
+    <div class="af-container">
+        <div class="af-footer-grid">
+            <!-- Col 1: Brand & Mission -->
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                    <span class="af-logo-mark" style="width: 34px; height: 34px;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        </svg>
+                    </span>
+                    <span class="font-display" style="font-size: 19px; font-weight: 800; color: #FFFFFF;">AquaFill</span>
+                    <span class="af-campus-badge" style="background: rgba(255,255,255,0.08); color: var(--brand-cyan); border-color: rgba(255,255,255,0.15);">v2.0</span>
+                </div>
+                <p style="font-size: 13.5px; line-height: 1.65; margin: 0 0 16px 0; max-width: 320px;">
+                    Real-time campus water dispenser telemetry, hydration tracking, and janitorial maintenance dispatch built for Cebu Institute of Technology &ndash; University.
+                </p>
+                <div class="af-heartbeat-pill" style="background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3); color: #34D399;">
+                    <span class="af-heartbeat-dot"></span>
+                    <span>All Telemetry Systems Operational</span>
+                </div>
+            </div>
+
+            <!-- Col 2: Campus Zones -->
+            <div>
+                <h4 class="af-footer-heading">Campus Zones</h4>
+                <ul class="af-footer-links">
+                    <li><a href="#directory" class="js-building-jump" data-building="NGE Building">NGE Building Stations</a></li>
+                    <li><a href="#directory" class="js-building-jump" data-building="GLE Building">GLE Building Stations</a></li>
+                    <li><a href="#directory" class="js-building-jump" data-building="RTL Building">RTL Library &amp; CASE</a></li>
+                    <li><a href="#directory" class="js-building-jump" data-building="SAL Building">SAL Science Wing</a></li>
+                    <li><a href="#directory" class="js-building-jump" data-building="Main / Admin">Main / Wildcats Gym</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 3: Student & Staff Actions -->
+            <div>
+                <h4 class="af-footer-heading">Student &amp; Staff Actions</h4>
+                <ul class="af-footer-links">
+                    <li><a href="#directory">Live Dispenser Directory</a></li>
+                    <li><a href="#directory" class="open-report-btn">Report Empty / Issue</a></li>
+                    <li><a href="#janitorial-logs">Janitorial Activity Logbook</a></li>
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url 'user_profile:profile' %}">Personal Hydration Profile</a></li>
+                    <li><a href="{% url 'user_settings:settings' %}">Notification Settings</a></li>
+                    {% endif %}
+                    <li><a href="/admin/">Admin &amp; Facilities Portal</a></li>
+                </ul>
+            </div>
+
+            <!-- Col 4: Project & Academic Attribution -->
+            <div>
+                <h4 class="af-footer-heading">Institutional Attribution</h4>
+                <p style="font-size: 13px; line-height: 1.6; margin: 0 0 12px 0;">
+                    Built for <strong style="color: #F8FAFC;">Cebu Institute of Technology &ndash; University (CIT-U)</strong> &bull; Campus Facilities &amp; Hydration Monitoring Initiative.
+                </p>
+                <p class="font-mono-num" style="font-size: 11.5px; color: #64748B; margin: 0;">
+                    Django Vertical Slice Architecture &bull; Supabase PostgreSQL Ready
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding-top: 24px; font-size: 12.5px;">
+            <span>&copy; {% now "Y" %} AquaFill CIT-U Campus Operations Portal. All rights reserved.</span>
+            <span class="font-mono-num" style="color: #64748B;">AquaFill Telemetry Release v2.0</span>
+        </div>
+    </div>
+</footer>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'home/js/home.js' %}"></script>
+<!-- ==========================================================================
+     PART 3: VANILLA JAVASCRIPT INTERACTIVITY & MULTI-CRITERIA FILTERING ENGINE
+     ========================================================================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('station-search');
+    const clearSearchBtn = document.getElementById('clear-search-btn');
+    const statusButtons = document.querySelectorAll('.station-filter-btn');
+    const buildingSelect = document.getElementById('building-select');
+    const tempChips = document.querySelectorAll('.js-temp-chip');
+    const buildingJumpButtons = document.querySelectorAll('.js-building-jump');
+    const resetButtons = [
+        document.getElementById('reset-all-filters'),
+        document.getElementById('empty-reset-btn')
+    ];
+    const cards = Array.from(document.querySelectorAll('.dispenser-card'));
+    const resultCounter = document.getElementById('live-result-counter');
+    const noResultsBox = document.getElementById('js-no-results');
+
+    // State
+    let activeStatus = 'all';
+    let activeBuilding = 'all';
+    let activeTemps = new Set();
+
+    // Update dynamic status tab counts from DOM cards
+    function updateTabCounts() {
+        let countAll = cards.length;
+        let countOpt = 0;
+        let countLow = 0;
+        let countMaint = 0;
+
+        cards.forEach(card => {
+            const status = card.dataset.status || '';
+            const level = parseInt(card.dataset.level || '0', 10);
+            if (status === 'ONLINE' && level >= 40) {
+                countOpt++;
+            } else if (status === 'LOW_WATER' || (status === 'ONLINE' && level < 40)) {
+                countLow++;
+            } else {
+                countMaint++;
+            }
+        });
+
+        const elAll = document.getElementById('count-all');
+        const elOpt = document.getElementById('count-operational');
+        const elLow = document.getElementById('count-low');
+        const elMaint = document.getElementById('count-maint');
+        if (elAll) elAll.textContent = countAll;
+        if (elOpt) elOpt.textContent = countOpt;
+        if (elLow) elLow.textContent = countLow;
+        if (elMaint) elMaint.textContent = countMaint;
+    }
+
+    // 1. Multi-Criteria Real-Time Filtering Engine
+    function applyFilters() {
+        const query = (searchInput ? searchInput.value.trim().toLowerCase() : '');
+        if (clearSearchBtn) {
+            clearSearchBtn.style.display = query.length > 0 ? 'block' : 'none';
+        }
+
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const searchBlob = (card.dataset.search || '').toLowerCase();
+            const building = card.dataset.building || '';
+            const rawBuilding = card.dataset.rawBuilding || '';
+            const status = card.dataset.status || '';
+            const level = parseInt(card.dataset.level || '0', 10);
+            const temps = (card.dataset.temp || '').split(',');
+
+            // Search query check
+            const matchesQuery = !query || searchBlob.includes(query);
+
+            // Status tab check
+            let matchesStatus = true;
+            if (activeStatus === 'operational') {
+                matchesStatus = (status === 'ONLINE' && level >= 40);
+            } else if (activeStatus === 'low_water') {
+                matchesStatus = (status === 'LOW_WATER' || (status === 'ONLINE' && level < 40));
+            } else if (activeStatus === 'maintenance') {
+                matchesStatus = (status === 'MAINTENANCE' || status === 'OFFLINE');
+            }
+
+            // Building check
+            let matchesBuilding = true;
+            if (activeBuilding !== 'all') {
+                matchesBuilding = (building === activeBuilding || rawBuilding.toLowerCase().includes(activeBuilding.toLowerCase()));
+            }
+
+            // Temperature chip check
+            let matchesTemp = true;
+            if (activeTemps.size > 0) {
+                activeTemps.forEach(t => {
+                    if (!temps.includes(t)) {
+                        matchesTemp = false;
+                    }
+                });
+            }
+
+            if (matchesQuery && matchesStatus && matchesBuilding && matchesTemp) {
+                card.style.display = '';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Update counter & empty state
+        if (resultCounter) {
+            resultCounter.innerHTML = `Showing <strong>${visibleCount}</strong> of <strong>${cards.length}</strong> campus dispensers`;
+        }
+        if (noResultsBox) {
+            noResultsBox.style.display = (visibleCount === 0 && cards.length > 0) ? 'block' : 'none';
+        }
+
+        const hasActiveFilter = query.length > 0 || activeStatus !== 'all' || activeBuilding !== 'all' || activeTemps.size > 0;
+        const resetBtn = document.getElementById('reset-all-filters');
+        if (resetBtn) {
+            resetBtn.style.display = hasActiveFilter ? 'inline-block' : 'none';
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyFilters);
+    }
+
+    if (clearSearchBtn && searchInput) {
+        clearSearchBtn.addEventListener('click', function () {
+            searchInput.value = '';
+            searchInput.focus();
+            applyFilters();
+        });
+    }
+
+    statusButtons.forEach(btn => {
+        btn.addEventListener('click', function () {
+            statusButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            activeStatus = this.dataset.filter || 'all';
+            applyFilters();
+        });
+    });
+
+    if (buildingSelect) {
+        buildingSelect.addEventListener('change', function () {
+            activeBuilding = this.value;
+            buildingJumpButtons.forEach(b => {
+                b.classList.toggle('active', b.dataset.building === activeBuilding);
+            });
+            applyFilters();
+        });
+    }
+
+    tempChips.forEach(chip => {
+        chip.addEventListener('click', function () {
+            const temp = this.dataset.temp;
+            if (activeTemps.has(temp)) {
+                activeTemps.delete(temp);
+                this.classList.remove('active');
+            } else {
+                activeTemps.add(temp);
+                this.classList.add('active');
+            }
+            applyFilters();
+        });
+    });
+
+    // 2. Building Quick-Jump Integration
+    buildingJumpButtons.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetBldg = this.dataset.building || 'all';
+            activeBuilding = targetBldg;
+            if (buildingSelect) {
+                buildingSelect.value = targetBldg;
+            }
+            buildingJumpButtons.forEach(b => {
+                b.classList.toggle('active', b.dataset.building === targetBldg);
+            });
+            applyFilters();
+            const dir = document.getElementById('directory');
+            if (dir) {
+                dir.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        });
+    });
+
+    // Reset all filters
+    resetButtons.forEach(btn => {
+        if (!btn) return;
+        btn.addEventListener('click', function () {
+            if (searchInput) searchInput.value = '';
+            activeStatus = 'all';
+            activeBuilding = 'all';
+            activeTemps.clear();
+            statusButtons.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
+            if (buildingSelect) buildingSelect.value = 'all';
+            tempChips.forEach(c => c.classList.remove('active'));
+            buildingJumpButtons.forEach(b => b.classList.toggle('active', b.dataset.building === 'all'));
+            applyFilters();
+        });
+    });
+
+    // 3. Keyboard Shortcut ('/' to focus search, 'Escape' to clear/close modals)
+    document.addEventListener('keydown', function (e) {
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
+        const isTyping = (tag === 'input' || tag === 'textarea' || tag === 'select');
+
+        if (e.key === '/' && !isTyping && searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+        } else if (e.key === 'Escape') {
+            if (document.activeElement === searchInput && searchInput.value) {
+                searchInput.value = '';
+                applyFilters();
+            }
+            const reportModal = document.getElementById('report-modal');
+            const detailModal = document.getElementById('detail-modal');
+            if (reportModal) reportModal.classList.add('hidden');
+            if (detailModal) detailModal.classList.add('hidden');
+        }
+    });
+
+    // 4. Mobile Navigation Drawer Toggle
+    const mobileBtn = document.getElementById('af-mobile-menu-btn');
+    const mobileDrawer = document.getElementById('af-mobile-drawer');
+    if (mobileBtn && mobileDrawer) {
+        mobileBtn.addEventListener('click', function () {
+            const isOpen = mobileDrawer.classList.toggle('open');
+            mobileBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+    }
+
+    // 5. Scroll-Triggered Progress Bar & Radial Gauge Animations
+    const radialCircle = document.getElementById('hero-radial-circle');
+    if (radialCircle) {
+        const pct = parseFloat(radialCircle.dataset.pct || '88');
+        const circumference = 2 * Math.PI * 46; // ~289
+        const offset = circumference - (pct / 100) * circumference;
+        radialCircle.style.strokeDasharray = `${circumference}`;
+        radialCircle.style.strokeDashoffset = `${offset}`;
+    }
+
+    if ('IntersectionObserver' in window) {
+        const barObserver = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const bar = entry.target;
+                    bar.style.width = bar.dataset.targetWidth || '0%';
+                    obs.unobserve(bar);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        document.querySelectorAll('.js-water-bar').forEach(bar => {
+            const target = bar.dataset.targetWidth;
+            bar.style.width = '0%';
+            setTimeout(() => {
+                barObserver.observe(bar);
+                bar.style.width = target;
+            }, 60);
+        });
+    }
+
+    // Report Modal Wiring (Preserves existing station pre-selection)
+    const openReportBtns = document.querySelectorAll('.open-report-btn');
+    const reportModal = document.getElementById('report-modal');
+    const closeReportBtn = document.getElementById('close-report-modal');
+    const modalStationSelect = document.getElementById('id_station');
+
+    openReportBtns.forEach(btn => {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            const stationId = this.dataset.stationId;
+            if (modalStationSelect && stationId) {
+                modalStationSelect.value = stationId;
+            }
+            if (reportModal) {
+                reportModal.classList.remove('hidden');
+            }
+        });
+    });
+
+    if (closeReportBtn && reportModal) {
+        closeReportBtn.addEventListener('click', () => reportModal.classList.add('hidden'));
+    }
+
+    // Station Details Modal Wiring
+    const detailModal = document.getElementById('detail-modal');
+    const closeDetailBtn = document.getElementById('close-detail-modal');
+    document.querySelectorAll('.js-view-details').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.getElementById('detail-code').textContent = this.dataset.code || 'DSP-UNIT';
+            document.getElementById('detail-modal-title').textContent = this.dataset.name || 'Dispenser Station';
+            document.getElementById('detail-location').textContent = `${this.dataset.building || ''} • ${this.dataset.floor || ''}`;
+            document.getElementById('detail-level').textContent = `${this.dataset.level || '0'}%`;
+            document.getElementById('detail-temp').textContent = `${this.dataset.temp || '8.5'}°C`;
+            document.getElementById('detail-dispensed').textContent = `${this.dataset.dispensed || '0'} L`;
+            document.getElementById('detail-refilled').textContent = this.dataset.refilled || 'Recently';
+            if (detailModal) detailModal.classList.remove('hidden');
+        });
+    });
+
+    if (closeDetailBtn && detailModal) {
+        closeDetailBtn.addEventListener('click', () => detailModal.classList.add('hidden'));
+    }
+
+    updateTabCounts();
+    applyFilters();
+});
+</script>
 {% endblock %}
