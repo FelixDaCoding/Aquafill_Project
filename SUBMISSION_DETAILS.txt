@@ -6,54 +6,32 @@ GitHub Repository URL: https://github.com/FelixDaCoding/Aquafill_Project
 Development Date: November 16, 2026
 Development Time: 3:00 PM – 6:00 PM
 
-================================================================================
-PROJECT OVERVIEW & SESSION ACCOMPLISHMENTS (3:00 PM – 6:00 PM)
-================================================================================
-During today's designated three-hour development session, I developed, overhauled, and tested AquaFill—a real-time campus water dispenser monitoring, hydration tracking, and janitorial maintenance dispatch web application built with Django using Vertical Slice Architecture (authentication, home, user_profile, and user_settings apps) for Cebu Institute of Technology – University (CIT-U).
+Session Development Summary:
+During today's 3-hour development session (3:00 PM – 6:00 PM), the AquaFill web application was overhauled into a full-featured CIT-U Campus Hydration Telemetry and Janitorial Operations Portal built on Django Vertical Slice Architecture (authentication, home, user_profile, and user_settings slices). Key work completed includes:
+- Engineered a 9-section responsive SaaS & IoT Telemetry Portal (home.html / index.html) featuring a live campus announcement ticker, sticky glassmorphic navigation header, split-screen hero with an animated SVG radial readiness gauge, multi-faceted client-side search/filter command bar (building, status, temperature, and "/" keyboard shortcut), bento dispenser telemetry cards with animated water-level gauges, a 5-building CIT-U coverage matrix (NGE, GLE, RTL, SAL, Main/Admin), a live janitorial dispatch activity timeline, and a sustainability impact banner.
+- Unified the application shell (base.html), Personal Hydration Profile (profile.html, profile_edit.html), Account & Alert Preferences Console (settings.html, settings.js), and Campus Authentication screens (login.html, register.html) under a single cohesive CSS Custom Properties design system.
+- Enhanced backend models (home/models.py), views (home/views.py), and database seeding (seed_aquafill.py) with computed station telemetry codes (DSP-NGE-*, DSP-GLE-*, DSP-RTL-*, DSP-SAL-*, DSP-MAIN-*), building groupings, readiness metrics, and default administrator/facility staff credentials.
 
-Key features and improvements implemented during this session:
-1. Full 9-Section Flagship Front-End Portal Overhaul (home.html & index.html):
-   - Engineered a scalable CSS Custom Properties design system (:root tokens for surface hierarchy, WCAG AA semantic status badges, Plus Jakarta Sans / Inter / JetBrains Mono typography, and radial dot-grid background textures).
-   - Built Section 1 (Live Campus Announcement & Telemetry Ticker Strip) and Section 2 (Sticky Glassmorphic Navigation Header with live network heartbeat indicator and mobile drawer).
-   - Built Section 3 (Split-Screen Hero & Live Campus Readiness Executive Card) featuring an animated SVG circular radial gauge, fleet distribution stacked bar, and real-time KPI cards.
-   - Built Section 4 (Floating Multi-Faceted Search, Filter & Sort Command Bar) with instant text search, "/" keyboard shortcut, segmented status tabs with live unit counters, building selector, and multi-select temperature chips (Cold, Warm, Hot).
-   - Built Section 5 (Bento-Style Dispenser Telemetry Grid) displaying unit codes (DSP-NGE-*, DSP-GLE-*, DSP-RTL-*, DSP-SAL-*, DSP-MAIN-*), animated water tank gauges with 25%/50%/75% tick marks, temperature matrices, relative refill timestamps, station detail modals, and 1-click issue reporting.
-   - Built Section 6 (CIT-U 5-Building Coverage Matrix), Section 7 (Live Janitorial Dispatch Timeline & 3-Step Civic Workflow), Section 8 (Dark-Mode Campus Sustainability & Plastic Reduction Impact Banner), and Section 9 (Enterprise 4-Column Footer).
-
-2. Unified UI/UX Across Profile, Edit Profile & Settings Vertical Slices:
-   - Upgraded the global base template (base.html), Personal Hydration Profile (profile.html), Profile Editor (profile_edit.html), and Account & Alert Preferences Console (settings.html & settings.js) to match the flagship telemetry design system.
-   - Implemented interactive quick-log water intake chips (+250ml, +500ml, +750ml, +1000ml), segmented tank progress gauges, and sustainability achievement cards.
-
-3. Backend Telemetry Models, Views, Admin & Database Seeding:
-   - Extended WaterStation in home/models.py with computed telemetry properties (unit codes, building groupings, status categories, and temperature capabilities).
-   - Updated home/views.py to calculate live readiness percentages, operational/low-water/maintenance distributions, and recent maintenance report logs.
-   - Updated seed_aquafill.py to seed CIT-U campus dispensers across NGE, GLE, RTL, SAL, and Main/Admin buildings and configured staff/superuser access for facility management.
-
-================================================================================
-SUBMITTED EVIDENCE DETAILS
-================================================================================
-
-1. Application Screenshots (Located in APPLICATION_SCREENSHOTS/)
-   - 01_Dashboard_LiveTelemetry.jpg: Captures the running AquaFill telemetry portal at http://127.0.0.1:8080/home/, showcasing the sticky glassmorphic navbar, the split-screen hero, the 77% Live Campus Readiness SVG radial gauge (10 Operational, 3 Needs Refill, 2 Maintenance across 15 total units), building quick-jump pills, and the 4 KPI summary cards.
-   - 02_Dashboard_ReportModal_Overlay.jpg: Captures the live interactive "Report Dispenser Issue / Empty Tank" modal overlay triggered over the main dashboard when a student or staff member clicks "Report an Issue".
-   - 03_ReportDispenserIssue_Modal.png: Detailed capture of the maintenance ticket dispatch form showing the Target Campus Dispenser dropdown, Issue Encountered selector (Water Tank Empty / Needs Refill), and Notes / Landmark Details input field.
-   - 04_UserManagement_DjangoAdmin.png: Captures the running Django Administration interface (/admin/auth/user/) displaying registered campus accounts (admin, ampards, earl, felix, test_student) and all registered AquaFill vertical slice models (AquaFill Profiles, Campus Water Stations, Station Maintenance Reports, User Extended Profiles, and User Settings).
+Submitted Evidence:
+1. Application Screenshots (APPLICATION_SCREENSHOTS/)
+   - 01_Dashboard_LiveTelemetry.jpg: Full-page view of the live CIT-U Campus Hydration Telemetry dashboard showing the 77% Live Campus Readiness SVG radial gauge, Active Dispensers KPI cards (10/15 online, 3 low supply alerts, 3 pending reports), and building quick-jump filters.
+   - 02_Dashboard_ReportModal_Overlay.jpg: Running web application displaying the interactive "Report Dispenser Issue / Empty Tank" modal overlay triggered directly from the navigation bar over the live telemetry dashboard.
+   - 03_ReportDispenserIssue_Modal.png: Close-up view of the maintenance and refill dispatch form allowing students and staff to select a target campus dispenser, specify the issue type (e.g., Water Tank Empty / Needs Refill), and submit landmark notes.
+   - 04_UserManagement_DjangoAdmin.png: Django Administration console (/admin/auth/user/) showing registered campus users (admin, ampards, earl, felix, test_student) alongside the AquaFill Authentication, Home Dashboard, User Profile, and User Settings vertical slice modules.
 
 2. Git Source Code Changes (GIT_ALL_COMMITTED_CHANGES.patch & GIT_DIFF_STAT.txt)
-   - Contains the complete binary diff patch and file change statistics from the baseline commit (19386c195c2cd9c67e785039494cd00dd1104b5e) to the final session commit (4602a0d064146f111d826330ef15406fb192e1de).
-   - Verifies 7,266 line insertions and 535 deletions across 11 modified and newly created files in the repository, plus GIT_UNCOMMITTED_CHANGES.patch and GIT_STATUS.txt confirming a clean tracked state.
+   - Full binary diff patch and diffstat comparing the 3:00 PM baseline commit (19386c195c2cd9c67e785039494cd00dd1104b5e) against HEAD (4602a0d064146f111d826330ef15406fb192e1de), documenting 7,266 insertions and 535 deletions across 11 modified/created project files (home.html, index.html, base.html, profile.html, profile_edit.html, settings.html, settings.js, models.py, views.py, and seed_aquafill.py).
 
 3. Git Commit History (GIT_HISTORY.txt & GIT_COMMIT_DETAILS.txt)
-   - Documents regular, incremental commits made and pushed throughout the 3:00 PM – 6:00 PM session on November 16, 2026:
-     * 19386c1 | FelixDaCoding | 2026-11-16 16:28:31 +0800 | Initial commit: AquaFill project
-     * 86d0cb8 | FelixDaCoding | 2026-11-16 16:42:28 +0800 | Feat: Complete CIT-U AquaFill front-end telemetry portal overhaul
-     * e51780f | FelixDaCoding | 2026-11-16 16:58:51 +0800 | Feat: Unify Profile, Edit Profile, Settings, and Base shell with CIT-U telemetry UI/UX
-     * 10c7e33 | FelixDaCoding | 2026-11-16 17:14:06 +0800 | Feat: Unify Django Admin console, Admin Login, and Campus Auth screens with CIT-U telemetry UI/UX
-     * 4602a0d | FelixDaCoding | 2026-11-16 17:20:22 +0800 | Revert custom admin templates to restore standard Django Admin
+   - Complete chronological log and per-commit file statistics of all commits authored and pushed during the 3:00 PM – 6:00 PM window on November 16, 2026:
+     * 19386c1 (16:28:31 +0800): Initial commit: AquaFill project (Baseline)
+     * 86d0cb8 (16:42:28 +0800): Feat: Complete CIT-U AquaFill front-end telemetry portal overhaul
+     * e51780f (16:58:51 +0800): Feat: Unify Profile, Edit Profile, Settings, and Base shell with CIT-U telemetry UI/UX
+     * 10c7e33 (17:14:06 +0800): Feat: Unify Django Admin console, Admin Login, and Campus Auth screens with CIT-U telemetry UI/UX
+     * 4602a0d (17:20:22 +0800): Revert custom admin templates to restore standard Django Admin
 
-4. GitHub Commit History Screenshots (Located in GITHUB_SCREENSHOTS/)
-   - Verifies that all local commits and source code changes from today's development session have been pushed to the remote GitHub repository (https://github.com/FelixDaCoding/Aquafill_Project) on the main branch.
+4. GitHub Commit History Screenshots (GITHUB_SCREENSHOTS/)
+   - Verification of remote repository synchronization and commit history pushed to https://github.com/FelixDaCoding/Aquafill_Project (branch: main).
 
-5. Baseline Commit Evidence (BASELINE_COMMIT.txt)
-   - Records the full starting reference commit hash, author, ISO timestamp, and subject line prior to the UI/UX and telemetry overhaul:
-     19386c195c2cd9c67e785039494cd00dd1104b5e | FelixDaCoding | 2026-11-16 16:28:31 +0800 | Initial commit: AquaFill project
+5. Baseline Commit Evidence (BASELINE_COMMIT.txt & GIT_STATUS.txt)
+   - Recorded starting baseline commit hash (19386c195c2cd9c67e785039494cd00dd1104b5e | FelixDaCoding | 2026-11-16 16:28:31 +0800 | Initial commit: AquaFill project) and current working tree status verification.
