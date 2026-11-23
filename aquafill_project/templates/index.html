@@ -1562,9 +1562,11 @@ body {
             </button>
 
             {% if user.is_authenticated %}
+                {% if user.is_staff or user.username == 'admin' %}
                 <a href="/admin/" class="af-btn af-btn-primary">
                     <span>Janitorial &amp; Admin Portal</span>
                 </a>
+                {% endif %}
                 <form method="post" action="{% url 'authentication:logout' %}" style="margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="af-btn af-btn-outline" title="Signed in as {{ user.username }}">
@@ -1573,7 +1575,7 @@ body {
                 </form>
             {% else %}
                 <a href="{% url 'authentication:login' %}" class="af-btn af-btn-primary">
-                    <span>Janitorial &amp; Admin Portal</span>
+                    <span>Campus Sign In</span>
                 </a>
             {% endif %}
 
@@ -2441,7 +2443,9 @@ body {
                     <li><a href="{% url 'user_profile:profile' %}">Personal Hydration Profile</a></li>
                     <li><a href="{% url 'user_settings:settings' %}">Notification Settings</a></li>
                     {% endif %}
+                    {% if user.is_staff or user.username == 'admin' %}
                     <li><a href="/admin/">Admin &amp; Facilities Portal</a></li>
+                    {% endif %}
                 </ul>
             </div>
 

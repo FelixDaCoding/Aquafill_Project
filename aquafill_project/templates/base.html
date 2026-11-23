@@ -617,9 +617,11 @@
                     <span>{{ user.username }}</span>
                 </a>
 
+                {% if user.is_staff or user.username == 'admin' %}
                 <a href="/admin/" class="af-btn af-btn-primary">
                     <span>Admin Portal</span>
                 </a>
+                {% endif %}
 
                 <form method="post" action="{% url 'authentication:logout' %}" style="margin: 0;">
                     {% csrf_token %}
@@ -645,7 +647,9 @@
             <a href="{% url 'home:home' %}" class="af-nav-link {% if request.resolver_match.app_name == 'home' %}active{% endif %}">Live Dispenser Directory</a>
             <a href="{% url 'user_profile:profile' %}" class="af-nav-link {% if request.resolver_match.app_name == 'user_profile' %}active{% endif %}">My Hydration Profile ({{ user.username }})</a>
             <a href="{% url 'user_settings:settings' %}" class="af-nav-link {% if request.resolver_match.app_name == 'user_settings' %}active{% endif %}">System &amp; Alert Settings</a>
+            {% if user.is_staff or user.username == 'admin' %}
             <a href="/admin/" class="af-nav-link">Janitorial &amp; Admin Portal</a>
+            {% endif %}
         </div>
     </div>
     {% endif %}
@@ -718,7 +722,9 @@
                         <li><a href="{% url 'home:home' %}">Live Dispenser Directory</a></li>
                         <li><a href="{% url 'user_profile:profile' %}">Personal Hydration Profile</a></li>
                         <li><a href="{% url 'user_settings:settings' %}">Notification &amp; Alert Settings</a></li>
+                        {% if user.is_staff or user.username == 'admin' %}
                         <li><a href="/admin/">Admin &amp; Facilities Portal</a></li>
+                        {% endif %}
                     </ul>
                 </div>
 

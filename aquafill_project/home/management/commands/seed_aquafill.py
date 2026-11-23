@@ -117,14 +117,26 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f'Successfully seeded {len(stations_data)} Water Stations ({created_count} newly created).'))
 
-        # Ensure default 'admin' user exists and all existing accounts have Admin/Superuser access
+        # Ensure default 'admin' user has exclusive Admin/Superuser access
         admin_user, _ = User.objects.update_or_create(
             username='admin',
-            defaults={'email': 'admin@cit.edu', 'is_staff': True, 'is_superuser': True},
+            defaults={
+                'email': 'admin@cit.edu',
+                'first_name': 'CIT-U',
+                'last_name': 'Facilities Admin',
+                'is_staff': True,
+                'is_superuser': True,
+            },
         )
         admin_user.set_password('admin12345')
         admin_user.save()
-        User.objects.all().update(is_staff=True, is_superuser=True)
+        Profile.objects.update_or_create(
+            user=admin_user,
+            defaults={'institutional_email': 'admin@cit.edu', 'role': Profile.Role.FACILITY_STAFF},
+        )
+
+        # Strictly revoke staff/superuser from all non-admin users so only admin can access the portal
+        User.objects.exclude(username='admin').update(is_staff=False, is_superuser=False)
 
         # Ensure all existing users have Profile, UserProfile, and UserSettings
         for user in User.objects.all():

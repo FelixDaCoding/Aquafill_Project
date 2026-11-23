@@ -7,6 +7,16 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView
 
+# Strictly restrict Django Admin access exclusively to the admin user
+def _admin_only_has_permission(request):
+    return (
+        request.user.is_active
+        and request.user.is_authenticated
+        and (request.user.username == 'admin' or (request.user.is_staff and request.user.is_superuser))
+    )
+
+admin.site.has_permission = _admin_only_has_permission
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 

@@ -124,7 +124,17 @@ def report_station_view(request):
 
 @login_required
 def refill_station_action(request, station_id):
-    """Quick facility staff action to mark station refilled."""
+    """Quick facility staff action to mark station refilled (restricted to admin & staff)."""
+    profile = getattr(request.user, 'profile', None)
+    is_staff_or_admin = (
+        request.user.username == 'admin' or
+        request.user.is_superuser or
+        request.user.is_staff
+    )
+    if not is_staff_or_admin:
+        messages.error(request, 'Access restricted: Only administrators and facility staff can execute refills.')
+        return redirect('home:home')
+
     try:
         station = WaterStation.objects.get(id=station_id)
         station.status = WaterStation.Status.ONLINE
